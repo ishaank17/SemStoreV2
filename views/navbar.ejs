@@ -10,12 +10,12 @@
         <ul class="flex space-x-4">
             <li><a href="#explore" class="text-blue-600 hover:text-blue-800">Explore</a></li>
             <li><a href="#about" class="text-blue-600 hover:text-blue-800">About</a></li>
-<!--            <?php-->
-<!--            if(empty($_SESSION['name']))-->
-                <li><a href="#" class="text-blue-600 hover:text-blue-800 login">Login</a></li>
-<!--            else-->
-<!--            echo '-<li><a href="Logout.php" class="text-blue-600 hover:text-blue-800 logout">Logout</a></li>';-->
-<!--            ?>-->
+            <% if (!name) { %>
+                <li><a href="<%=link %>" class="text-blue-600 hover:text-blue-800 login">Login</a></li>
+            <% } else { %>
+                <li><a href="/Logout" class="text-blue-600 hover:text-blue-800 logout">Logout</a></li>
+            <% } %>
+
 
 
         </ul>

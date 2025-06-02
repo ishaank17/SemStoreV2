@@ -1,5 +1,7 @@
+require('dotenv').config();
+const MONGO_URL = process.env.MONGO_URL;
 const mongoose = require('mongoose');
-mongoose.connect("mongodb://localhost:27017/DATABASE")
+mongoose.connect(`${MONGO_URL}`)
 const userSchema = mongoose.Schema({
     rollno:String,
     name:String,
