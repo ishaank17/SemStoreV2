@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#2196f3" >
+
+    <title>Sem-Store| IITGN</title>
+
+    <!-- Tailwind CSS CDN -->
+    <link href="/src/Style.css" rel="stylesheet">
+
+    <!-- Optional: Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+
+</head>
+
+<body class="min-h-screen  flex flex-col text-gray-800">
+<!--    changes-->
+<%- include('navbar.ejs') %>
+<!-- Hero Section -->
+<main class="flex-grow">
+    <header class="text-center py-16 bg-blue-100">
+        <h2 class="text-3xl font-bold text-[#1a71c9] mb-4">Empower Learning with Shared Resources</h2>
+        <p class="text-lg max-w-xl mx-auto text-gray-700">
+            A place for IITGN senior to contribute notes, papers, and more. Juniors can discover curated academic help semester-wise.
+        </p>
+        <a href="Home" class="mt-6 inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+            Start Exploring
+        </a>
+    </header>
+
+    <!-- Features Section -->
+    <section class="max-w-6xl mx-auto px-4 py-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-xl font-semibold text-blue-600">Search & Filter</h3>
+            <p class="mt-2 text-gray-700">Quickly find resources by course, semester or type.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-xl font-semibold text-blue-600">Verified Contributions</h3>
+            <p class="mt-2 text-gray-700">Seniors upload notes, past papers, and curated materials.</p>
+        </div>
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition">
+            <h3 class="text-xl font-semibold text-blue-600">Offline Access</h3>
+            <p class="mt-2 text-gray-700">PWA features allow offline view of previously loaded resources.</p>
+        </div>
+    </section>
+</main>
+<!--<?php include_once'footer.php'?>-->
+<%- include('footer.ejs') %>
+</body>
+
+</html>

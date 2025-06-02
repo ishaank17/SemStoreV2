@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#2196f3" >
+    <title>Enter Details - Sem-Store</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="/src/Style.css" rel="stylesheet">
+
+    <!-- Optional: Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        .login{
+            display:none;
+        }
+    </style>
+</head>
+
+<body class=" min-h-screen  flex flex-col text-gray-800">
+<%- include("navbar.ejs")%>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <form method="post" action="Create" class="bg-white rounded-2xl shadow-2xl mx-auto max-w-[80vw] space-y-4 p-6">
+        <h2 class="text-center text-xl font-extrabold ">Enter Your Details</h2>
+        <div class="flex w-full ">
+            <div class="w-full mr-3">
+                <label for="phone" class="block font-semibold mb-1" >Phone Number:</label>
+                <input
+                        class="block border border-gray-300 w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        type="tel"
+                        id="phone"
+                        name="phone"
+                        pattern="^\d{10}$"
+                        maxlength="10"
+                        required
+                        oninvalid="this.setCustomValidity('Please enter exactly 10 digits')"
+                        oninput="this.setCustomValidity('')"
+                        placeholder="Enter 10-digit number"
+                >
+            </div>
+            <div class="w-full ml-3">
+                <label for="batch" class="block font-semibold mb-1" >Batch:</label>
+                <input type="text" id="batch" name="batch" placeholder="eg. Btech28" class="block border border-gray-300  w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+        </div>
+        <div class="flex w-full ">
+            <div class="w-full mr-3">
+                <label for="branch" class="block mb-1 font-semibold text-gray-700">Branch:</label>
+                <select
+                        id="branch"
+                        name="branch"
+                        required
+                        class="block w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                    <option value="" disabled selected hidden>Select your branch</option>
+                    <option value="CSE">Computer Science Engineering (CSE)</option>
+                    <option value="AI">Artificial Intelligence (AI)</option>
+                    <option value="EE">Electrical Engineering (EE)</option>
+                    <option value="ICD">Integrated Circuit Design Technology (ICDT)</option>
+                    <option value="ME">Mechanical Engineering (ME)</option>
+                    <option value="CH">Chemical Engineering (CH)</option>
+                    <option value="CE">Civil Engineering (CE)</option>
+                    <option value="MSE">Material Science Engineering (MSE)</option>
+
+                </select>
+            </div>
+            <div class="w-full ml-3"></div>
+
+        </div>
+        <label for="bio" class="block font-semibold mb-1">Bio (Optional):</label>
+        <textarea  id="bio" name="bio" rows="3" placeholder="Type Here" class="block border border-gray-300 w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Submit</button>
+    </form>
+</main>
+
+<%- include("footer.ejs")%>
+
+</body>
+
+</html>
+
+
+
+
+
+
