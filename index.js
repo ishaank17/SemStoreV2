@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const userModel=require('./models/user');
 const content=require('./models/Content');
 const {requireLogin}=require('./models/LoginCheck');
+const {requireAdmin}=require('./models/AdminCheck');
 
 
 app.use(express.json())
@@ -140,12 +141,17 @@ app.get('/Signup', (req, res) => {
     res.render('Signup.ejs');
 })
 app.get('/Error', (req, res) => {
-    res.render('Error.ejs');
-})
+    const error = req.query.error;
+    res.render('error', { error });
+});
 
 app.get('/Logout', (req, res) => {
     res.cookie('session', "")
     res.redirect('/');
+})
+
+app.get('/Admin',requireAdmin, (req, res) => {
+    res.send('Admin page here');
 })
 
 // app.get('/Login', (req, res) => {
