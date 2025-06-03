@@ -1,11 +1,12 @@
 {
   "name": "IITGN Sem-Store",
-  "short_name": "Sem-Store",
+  "short_name": "Sem Store",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFE9D2",
   "theme_color": "#ffe1c4",
   "orientation": "portrait-primary",
+
   "icons": [
     {
       "src": "/icons/web-app-manifest-192x192.png",
@@ -18,6 +19,14 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+
+    },
+    {
+      "src": "/icons/iitgn-logo.png.144x144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "maskable any"
+
     }
   ]
 

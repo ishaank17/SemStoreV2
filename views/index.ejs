@@ -12,7 +12,7 @@
     <link rel="shortcut icon" href="/icons/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="SemStore" />
-    <link rel="manifest" href="/icons/site.webmanifest" />
+
     <title>Sem-Store| IITGN</title>
 
     <!-- Tailwind CSS CDN -->
@@ -28,6 +28,7 @@
 <!--    changes-->
 <%- include('navbar.ejs') %>
 <!-- Hero Section -->
+<!--<pre id="output"></pre>-->
 <main class="flex-grow">
     <header class="text-center py-16 bg-blue-100">
         <h2 class="text-3xl font-bold text-[#1a71c9] mb-4">Empower Learning with Shared Resources</h2>
@@ -55,6 +56,19 @@
         </div>
     </section>
 </main>
+
+
+<!--<script>-->
+<!--    window.addEventListener('load', function() {-->
+
+<!--        var outputElement = document.getElementById('output');-->
+<!--        -->
+
+<!--        window.addEventListener('beforeinstallprompt', function(e) {-->
+<!--            outputElement.textContent = 'beforeinstallprompt Event fired';-->
+<!--        });-->
+<!--    });-->
+<!--</script>-->
 <!--<?php include_once'footer.php'?>-->
 <%- include('footer.ejs') %>
 </body>
