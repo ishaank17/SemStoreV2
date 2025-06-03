@@ -4,11 +4,11 @@ const BASE_URL = process.env.BASE_URL;
 const express = require('express');
 const app = express();
 const path = require('path');
-// const bcrypt = require('bcrypt');
 const jwt=require("jsonwebtoken");
 const cookieParser = require('cookie-parser');
 const userModel=require('./models/user');
-
+const content=require('./models/Content');
+const {requireLogin}=require('./models/LoginCheck');
 
 
 app.use(express.json())
@@ -112,12 +112,35 @@ app.post('/Create', async (req, res) => {
     res.redirect('/Home');
 })
 
-app.get('/Home', (req, res) => {
+app.get('/Home',  requireLogin,async(req, res) => {
     res.render('Home.ejs');
+
 })
+app.get('/Home/search', requireLogin, async (req, res) => {
+    const { q, semester, branch,order } = req.query;
+
+    let filter = {};
+
+    if (q) {
+        filter.$or = [
+            { title: { $regex: q, $options: 'i' } },
+            { coursecode: { $regex: q, $options: 'i' } },
+            { tags: { $regex: q, $options: 'i' } }
+        ];
+    }
+    if (semester) filter.semester = semester;
+    if (branch) filter.branch = branch;
+    // console.log(typeof (order));
+    // console.log("Filter:", JSON.stringify(filter, null, 2));
+    const results = await content.find(filter).sort({ popularity: parseInt(order) })   .limit(20);
+    res.json(results);
+});
 
 app.get('/Signup', (req, res) => {
     res.render('Signup.ejs');
+})
+app.get('/Error', (req, res) => {
+    res.render('Error.ejs');
 })
 
 app.get('/Logout', (req, res) => {
@@ -160,14 +183,3 @@ app.get('/Logout', (req, res) => {
 
 app.listen(80)
 
-// bcrypt.genSalt(10, (err, salt) => {
-//     bcrypt.hash("PASSWORD", salt, (err, hash) => {
-//         // store hash
-//     })
-// })
-
-// bcrypt.compare("PASSWORD", "hash",(err, isMatch) => {
-//     if (isMatch) {
-//
-//     }
-// })

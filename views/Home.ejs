@@ -19,12 +19,13 @@
 <body class="min-h-screen  flex flex-col text-gray-800">
 <%- include("navbar.ejs")%>
 <main class="flex-grow p-6 ">
-    <form  method="get" action="#">
+    <form  action="javascript:void(0)">
         <div class="flex flex-row justify-center gap-4">
             <div class="flex w-full max-w-md sm:flex">
                 <input
                         type="text"
                         name="search"
+                        id="search"
                         placeholder="Search... MA104"
                         class="pl-3 pr-10 py-2 w-full border border-gray-300 rounded-l-lg bg-gray-50 focus:outline-none focus:border-black text-sm"
                 >
@@ -47,16 +48,18 @@
             </div>
 
             <div class="hidden sm:block" >
-                <select id="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
-                    <option hidden disabled selected>Semester</option>
-                    <option>Semester-1</option>
-                    <option>Semester-2</option>
+                <select id="sem" name="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                    <option value="" hidden disabled selected>Semester</option>
+                    <option value="" >None</option>
+                    <option value="sem1">Semester-1</option>
+                    <option value="sem2">Semester-2</option>
                 </select>
             </div>
 
             <div class="hidden sm:block" >
-                <select id="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                <select id="branch" name="branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
                     <option value="" disabled selected hidden>Select your branch</option>
+                    <option value="" >None</option>
                     <option value="CSE">CSE</option>
                     <option value="AI">AI</option>
                     <option value="EE">EE</option>
@@ -68,24 +71,29 @@
                 </select>
             </div>
             <div class="hidden sm:block">
-
-                <button
-                        type="button"
-                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"
-                >
-                    <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            viewBox="0 0 24 24"
-                    >
-                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.586L3.293 6.707A1 1 0 013 6V4z" />
-                    </svg>
-                    Apply Filter
-                </button>
+<!--                apply filter-->
+<!--                <button-->
+<!--                        type="button"-->
+<!--                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"-->
+<!--                >-->
+<!--                    <svg-->
+<!--                            class="w-4 h-4"-->
+<!--                            fill="none"-->
+<!--                            stroke="currentColor"-->
+<!--                            stroke-width="2"-->
+<!--                            stroke-linecap="round"-->
+<!--                            stroke-linejoin="round"-->
+<!--                            viewBox="0 0 24 24"-->
+<!--                    >-->
+<!--                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.586L3.293 6.707A1 1 0 013 6V4z" />-->
+<!--                    </svg>-->
+<!--                    Apply Filter-->
+<!--                </button>-->
+                <select id="order" name="order" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                    <option value="" disabled selected hidden>Popularity</option>
+                    <option value="-1">Descending</option>
+                    <option value="1">Ascending</option>
+                </select>
 
             </div>
             <div class="block sm:hidden" >
@@ -107,16 +115,18 @@
         </div>
         <div class="flex flex-col gap-4 p-4 bg-white rounded-2xl shadow-md border border-gray-200 hidden sm:hidden" id="mobileFilter">
             <div class="block" >
-                <select id="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
-                    <option hidden disabled selected>Semester</option>
-                    <option>Semester-1</option>
-                    <option>Semester-2</option>
+                <select id="sem-mobile" name="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                    <option value="" hidden disabled selected>Semester</option>
+                    <option value="" >None</option>
+                    <option value="sem1">Semester-1</option>
+                    <option value="sem2">Semester-2</option>
                 </select>
             </div>
 
             <div class="block" >
-                <select id="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                <select id="branch-mobile" name="branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
                     <option value="" disabled selected hidden>Select your branch</option>
+                    <option value="" >None</option>
                     <option value="CSE">CSE</option>
                     <option value="AI">AI</option>
                     <option value="EE">EE</option>
@@ -128,76 +138,69 @@
                 </select>
             </div>
             <div class="block" >
-                <button
-                        type="button"
-                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"
-                >
-                    <svg
-                            class="w-4 h-4"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            viewBox="0 0 24 24"
-                    >
-                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.586L3.293 6.707A1 1 0 013 6V4z" />
-                    </svg>
-                    Apply Filter
-                </button>
+<!--                <button-->
+<!--                        type="button"-->
+<!--                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"-->
+<!--                >-->
+<!--                    <svg-->
+<!--                            class="w-4 h-4"-->
+<!--                            fill="none"-->
+<!--                            stroke="currentColor"-->
+<!--                            stroke-width="2"-->
+<!--                            stroke-linecap="round"-->
+<!--                            stroke-linejoin="round"-->
+<!--                            viewBox="0 0 24 24"-->
+<!--                    >-->
+<!--                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.586L3.293 6.707A1 1 0 013 6V4z" />-->
+<!--                    </svg>-->
+<!--                    Apply Filter-->
+<!--                </button>-->
+                <select id="order-mobile" name="order" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                    <option value="" disabled selected hidden>Popularity</option>
+                    <option value="-1">Descending</option>
+                    <option value="1">Ascending</option>
+                </select>
 
             </div>
         </div>
     </form>
-    <div class="p-5 h-screen">
+
+    <div class="p-5 h-screen" >
 
 
         <div class="overflow-auto rounded-lg shadow hidden md:block">
             <table class="w-full">
                 <thead class="bg-gray-50 border-b-2 border-gray-200">
-
-                <th class="w-20 p-3 text-sm font-semibold tracking-wide text-left">Course Code</th>
-                <th class=" p-3 text-sm font-semibold tracking-wide text-left">Title</th>
-                <th class="p-3 text-sm font-semibold tracking-wide text-left">Description</th>
-                <th class="w-24 p-3 text-sm font-semibold tracking-wide text-left">Type</th>
-                <th class="w-24 p-3 text-sm font-semibold tracking-wide text-left">Uploaded By</th>
-                <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Time</th>
-                <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Available Offline</th>
-
+                <tr>
+                    <th class="w-20 p-3 text-sm font-semibold tracking-wide text-left">Course Code</th>
+                    <th class=" p-3 text-sm font-semibold tracking-wide text-left">Title</th>
+                    <th class="p-3 text-sm font-semibold tracking-wide text-left">Description</th>
+                    <th class="w-24 p-3 text-sm font-semibold tracking-wide text-left">Type</th>
+                    <th class="w-24 p-3 text-sm font-semibold tracking-wide text-left">Uploaded By</th>
+                    <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Time</th>
+                    <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Available Offline</th>
+                </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
-                <tr class=" text-gray-700 bg-white hover:bg-gray-200" ">
-                <td class="p-3 text-sm  whitespace-nowrap font-medium">ES116</td>
-                <td class="p-3 text-sm  whitespace-nowrap"><a href="#">Cedra and Smith</a></td>
-                <td class="p-3 text-sm  whitespace-nowrap">Book For First year chapters</td>
-                <td class="p-3 text-sm  whitespace-nowrap">PDF</td>
-                <td class="p-3 text-sm  whitespace-nowrap">Ishaan Kamath</td>
-                <td class="p-3 text-sm  whitespace-nowrap">May 28</td>
-                <td>
-                    <div class="flex flex-row gap-6">
-                        <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>
-                        <img src="images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
-                    </div>
-                </td>
-                </tr>
+                <tbody class="divide-y divide-gray-100" id="results">
 
-                <tr class="bg-white hover:bg-gray-200 text-gray-700 " >
 
-                    <td class="p-3 text-sm  whitespace-nowrap font-medium"  >ES116</td>
-                    <td class="p-3 text-sm  whitespace-nowrap" ><a href="#">Cedra and Smith</a></td>
-                    <td class="p-3 text-sm  whitespace-nowrap" >Book For First year chapters</td>
-                    <td class="p-3 text-sm  whitespace-nowrap" >PDF</td>
-                    <td class="p-3 text-sm  whitespace-nowrap" >Ishaan Kamath</td>
-                    <td class="p-3 text-sm  whitespace-nowrap" >May 28</td>
+<!--                <tr class="bg-white hover:bg-gray-200 text-gray-700 " >-->
 
-                    <td>
-                        <div class="flex flex-row gap-6">
-                            <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>
-                            <img src="images/tick.png" alt="is available offline">
-                        </div>
+<!--                    <td class="p-3 text-sm  whitespace-nowrap font-medium"  >ES116</td>-->
+<!--                    <td class="p-3 text-sm  whitespace-nowrap" ><a href="#">Cedra and Smith</a></td>-->
+<!--                    <td class="p-3 text-sm  whitespace-nowrap" >Book For First year chapters</td>-->
+<!--                    <td class="p-3 text-sm  whitespace-nowrap" >PDF</td>-->
+<!--                    <td class="p-3 text-sm  whitespace-nowrap" >Ishaan Kamath</td>-->
+<!--                    <td class="p-3 text-sm  whitespace-nowrap" >May 28</td>-->
 
-                    </td>
-                </tr>
+<!--                    <td>-->
+<!--                        <div class="flex flex-row gap-6">-->
+<!--                            <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>-->
+<!--                            <img src="images/tick.png" alt="is available offline">-->
+<!--                        </div>-->
+
+<!--                    </td>-->
+<!--                </tr>-->
 
 
                 </tbody>
@@ -205,50 +208,30 @@
         </div>
 
 
-        <div class="grid grid-cols-1 gap-4 md:hidden">
-            <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
-                <div class="flex items-center justify-between">
-                    <a href="#">
-                        <div class="flex flex-row space-x-2 ">
-                            <span class="font-semibold text-gray-800">ES116</span>
-                            <span class="text-gray-600 text-xs">Cedra and Smith</span>
-                        </div>
-                    </a>
-                    <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
-                        Make Available Offline
-                    </button>
-                </div>
-                <a href="#">
-                    <p class="text-gray-700 text-sm">Book for First Year Chapters</p>
-                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                        <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">PDF</span>
-                        <span>By: Ishaan Kamath</span>
-                        <span>28 May</span>
-                    </div>
-                </a>
-            </div>
+        <div class="grid grid-cols-1 gap-4 md:hidden" id="resultsmobile">
 
-            <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
-                <div class="flex items-center justify-between">
-                    <a href="#">
-                        <div class="flex flex-row space-x-2 ">
-                            <span class="font-semibold text-gray-800">ES116</span>
-                            <span class="text-gray-600 text-xs">Cedra and Smith</span>
-                        </div>
-                    </a>
-                    <button type="button" class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><img src="images/makeOffline.png" style="width:15px;height:15px;">
-                        Available Offline
-                    </button>
-                </div>
-                <a href="#">
-                    <p class="text-gray-700 text-sm">Book for First Year Chapters</p>
-                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                        <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">PDF</span>
-                        <span>By: Ishaan Kamath</span>
-                        <span>28 May</span>
-                    </div>
-                </a>
-            </div>
+
+<!--            <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">-->
+<!--                <div class="flex items-center justify-between">-->
+<!--                    <a href="#">-->
+<!--                        <div class="flex flex-row space-x-2 ">-->
+<!--                            <span class="font-semibold text-gray-800">ES116</span>-->
+<!--                            <span class="text-gray-600 text-xs">Cedra and Smith</span>-->
+<!--                        </div>-->
+<!--                    </a>-->
+<!--                    <button type="button" class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><img src="images/makeOffline.png" style="width:15px;height:15px;">-->
+<!--                        Available Offline-->
+<!--                    </button>-->
+<!--                </div>-->
+<!--                <a href="#">-->
+<!--                    <p class="text-gray-700 text-sm">Book for First Year Chapters</p>-->
+<!--                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">-->
+<!--                        <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">PDF</span>-->
+<!--                        <span>By: Ishaan Kamath</span>-->
+<!--                        <span>28 May</span>-->
+<!--                    </div>-->
+<!--                </a>-->
+<!--            </div>-->
         </div>
 
     </div>
@@ -256,7 +239,104 @@
 
 
 <%- include("footer.ejs")%>>
+<script>
+    console.log(window.innerWidth)
+    const isMobile = window.innerWidth < 640;
+    const searchInput = document.getElementById('search');
+    const semesterSelect = document.getElementById(isMobile ? 'sem-mobile' : 'sem');
+    const branchSelect = document.getElementById(isMobile ? 'branch-mobile' : 'branch');
+    const orderSelect = document.getElementById(isMobile ? 'order-mobile' : 'order');
+    const resultsContainer = document.getElementById('results'); // Create this div or UL for results
+    const resultsContainer2 = document.getElementById('resultsmobile');
 
+    let debounceTimeout;
+
+    function fetchResults() {
+        const form = document.querySelector('form');
+        const formData = new FormData(form);
+
+        const query = formData.get('search') || '';
+        const semester = formData.get('sem') || '';
+        const branch = formData.get('branch') || '';
+        const order = formData.get('order') || '-1';
+        console.log("Contents:",query,semester,branch,order);
+        const params = new URLSearchParams({
+            q: query,
+            semester,
+            branch,
+            order
+        });
+        console.log(params)
+        fetch(`/Home/Search?${params}`)
+            .then(res => res.json())
+            .then(data => {
+                resultsContainer.innerHTML = data.map(resource => {
+                        console.log(resource.coursecode)
+                        return `
+                <tr class=" text-gray-700 bg-white hover:bg-gray-200" >
+                    <td class="p-3 text-sm  whitespace-nowrap font-medium">${resource.coursecode}</td>
+                    <td class="p-3 text-sm  whitespace-nowrap"><a href="#">${resource.title}</a></td>
+                    <td class="p-3 text-sm  whitespace-nowrap">${resource.description}</td>
+                    <td class="p-3 text-sm  whitespace-nowrap">${resource.type}</td>
+                    <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedBy}</td>
+                    <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedAt}</td>
+                    <td>
+                        <div class="flex flex-row gap-6">
+                            <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>
+                            <img src="images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
+                        </div>
+                    </td>
+                </tr>`
+                }).join('');
+                resultsContainer2.innerHTML = data.map(resource => {
+                    console.log(resource.coursecode)
+                    return `
+                <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
+                <div class="flex items-center justify-between">
+                    <a href="#">
+                        <div class="flex flex-row space-x-2 ">
+                            <span class="font-semibold text-gray-800">${resource.coursecode}</span>
+                            <span class="text-gray-600 text-xs">${resource.title}</span>
+                        </div>
+                    </a>
+                    <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                        Make Available Offline
+                    </button>
+                </div>
+                <a href="#">
+                    <p class="text-gray-700 text-sm">${resource.description}</p>
+                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                        <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">PDF</span>
+                        <span>By: ${resource.uploadedBy}</span>
+                        <span>${resource.uploadedAt }</span>
+                    </div>
+                </a>
+            </div>`
+                }).join('');
+            });
+    }
+
+    function debounce(fn, delay) {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
+
+    fetchResults();
+    const debouncedFetchResults = debounce(fetchResults, 300);
+    searchInput?.addEventListener('input', debouncedFetchResults);
+    semesterSelect?.addEventListener('change', fetchResults);
+    branchSelect?.addEventListener('change', fetchResults);
+    orderSelect?.addEventListener('change', fetchResults);
+
+    document.querySelector('form').addEventListener('submit', e => {
+        e.preventDefault(); // prevent reload
+        // console.log("feth")
+        fetchResults();     // trigger fetch manually if user presses Enter or clicks button
+    });
+</script>
 </body>
 
 </html>
