@@ -39,7 +39,7 @@ app.get('/', (req, res) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:80');
     res.header("Access-Control-Allow-Credentials", 'true');
     res.header("Referrer-Policy","no-referrer-when-downgrade");
-    const redirectURL = 'http://localhost/Login';
+    const redirectURL = `${BASE_URL}/Login`;
 
     const oAuth2Client = new OAuth2Client(
         process.env.CLIENT_ID,
