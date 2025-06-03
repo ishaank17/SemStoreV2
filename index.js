@@ -18,6 +18,10 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname,"public")));
 app.set('view engine', 'ejs')
 
+
+
+
+
 app.use((req, res, next) => {
     try {
         const decoded = jwt.verify(req.cookies.session, process.env.SECRET);
@@ -153,6 +157,8 @@ app.get('/Logout', (req, res) => {
 app.get('/Admin',requireAdmin, (req, res) => {
     res.send('Admin page here');
 })
+
+
 
 // app.get('/Login', (req, res) => {
 //     res.send('Login file here');
