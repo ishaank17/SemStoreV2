@@ -14,7 +14,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     console.log('beforeinstallprompt event fired');
 });
 
-document.body.addEventListener('click', async () => {
+document.getElementById("download").addEventListener('click', async () => {
     if (deferredPrompt) {
         deferredPrompt.prompt();
         const choice = await deferredPrompt.userChoice;
