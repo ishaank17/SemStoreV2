@@ -1,7 +1,7 @@
 require('dotenv').config();
 const MONGO_URL = process.env.MONGO_URL;
 const mongoose = require('mongoose');
-mongoose.connect(`${MONGO_URL}`)
+mongoose.connect(`${MONGO_URL}`,{dbName: 'SemStore'})
 const userSchema = mongoose.Schema({
     rollno:String,
     name:String,
