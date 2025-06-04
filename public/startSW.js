@@ -45,7 +45,7 @@ async function  dwload()  {
         console.log('No install prompt available');
         return;
     }
-    alert("cclicke");
+    // alert("cclicke");
     deferredPrompt.prompt();
     const choice = await deferredPrompt.userChoice;
     console.log('User choice:', choice.outcome);
