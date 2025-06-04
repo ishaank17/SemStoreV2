@@ -11,14 +11,42 @@ let deferredPrompt;
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
+
     console.log('beforeinstallprompt event fired');
 });
 
-document.getElementById("download").addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const choice = await deferredPrompt.userChoice;
-        console.log('User choice:', choice.outcome);
-        deferredPrompt = null;
+// document.addEventListener("DOMContentLoaded", () => {
+//     const installBtn = document.getElementsByClassName("download");
+//     console.log('pre buttons', installBtn);
+//     if (installBtn) {
+//
+//         console.log('install button', installBtn);
+//         Array.from(installBtn).forEach(btn => {
+//             btn.addEventListener('click', async () => {
+//                 if (!deferredPrompt) {
+//                     console.log('No install prompt available');
+//                     return;
+//                 }
+//                 deferredPrompt.prompt();
+//                 const choice = await deferredPrompt.userChoice;
+//                 console.log('User choice:', choice.outcome);
+//                 deferredPrompt = null;
+//                 // Optionally hide the install button after install
+//                 // btn.style.display = 'none';
+//             });
+//         });
+//     }
+//
+//     // console.log('DOM fully loaded and parsed');
+// });
+
+async function  dwload()  {
+    if (!deferredPrompt) {
+        console.log('No install prompt available');
+        return;
     }
-}, { once: true });
+    deferredPrompt.prompt();
+    const choice = await deferredPrompt.userChoice;
+    console.log('User choice:', choice.outcome);
+    deferredPrompt = null;
+}
