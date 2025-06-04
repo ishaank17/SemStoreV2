@@ -8,7 +8,7 @@ const urlsToCache = [
     '/icons/web-app-manifest-192x192.png',
     '/icons/web-app-manifest-512x512.png',
     '/icons/iitgn-logo.png.144x144.png',
-    '/contents/Amplifiers- Sedra and Smith Reference.pdf',
+    // '/contents/Amplifiers- Sedra and Smith Reference.pdf',
     '/images/iitgn-logo.png',
     'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap',
     '/Offline.html'
