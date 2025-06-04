@@ -10,6 +10,9 @@ const userModel=require('./models/user');
 const content=require('./models/Content');
 const {requireLogin}=require('./models/LoginCheck');
 const {requireAdmin}=require('./models/AdminCheck');
+const multer = require('multer');
+const crypto = require('crypto');
+const db=require('./public/db');
 
 
 app.use(express.json())
@@ -18,6 +21,25 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname,"public")));
 app.set('view engine', 'ejs')
 
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/contents')
+    },
+    filename: function (req, file, cb) {
+         crypto.randomBytes(12, (e,b)=>{
+             if (e) {
+                 console.error("Error generating random bytes:", e);
+                 return cb(e, null);
+             }
+              const fname=path.basename(file.originalname,path.extname(file.originalname)) +"-"+b.toString("hex") + path.extname(file.originalname);
+             console.log("Generated file name:", fname);
+             cb(null, fname );
+         })
+
+    }
+})
+
+const upload = multer({ storage: storage })
 
 
 
@@ -29,9 +51,11 @@ app.use((req, res, next) => {
         res.locals.email = decoded.email;
         res.locals.profilePhoto = decoded.profilePhoto;
         res.locals.role = decoded.role;
+        // console.log(decoded.role)
     } catch (err) {
         res.locals.name = null;
         res.locals.link = null;
+        res.locals.role = "Error";
     }
     next();
 });
@@ -66,7 +90,7 @@ async function getUserData(accessToken) {
 app.get('/Login', async (req, res) => {
     const code = req.query.code;
     const redirectURL = `${BASE_URL}/Login`;
-    console.log(redirectURL);
+    // console.log(redirectURL);
     const oAuth2Client = new OAuth2Client(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,redirectURL
@@ -82,14 +106,15 @@ app.get('/Login', async (req, res) => {
     // console.log("4");
     // console.log(data);
     let row= await userModel.findOne({rollno:data.family_name})
-    let session= jwt.sign({rollno:data.family_name,
-        name: data.given_name,
-        email: data.email,
-        profilePhoto: data.picture,
-        role:"Student"},process.env.SECRET);
-    res.cookie('session',session);
+
+    // console.log(row)
 
     if(!row) {
+        let session= jwt.sign({rollno:data.family_name,
+            name: data.given_name,
+            email: data.email,
+            profilePhoto: data.picture,
+            role:"Student"},process.env.SECRET);
         await userModel.create({
             rollno:data.family_name,
             name: data.given_name,
@@ -97,9 +122,16 @@ app.get('/Login', async (req, res) => {
             profilePhoto: data.picture,
             role:"Student"
         })
+        res.cookie('session',session);
         res.redirect('/Signup',);
     }
     else{
+        let session= jwt.sign({rollno:row.rollno,
+            name: row.name,
+            email: row.email,
+            profilePhoto: row.profilePhoto,
+            role:row.role},process.env.SECRET);
+        res.cookie('session',session);
         res.redirect('/Home');
     }
 })
@@ -155,10 +187,32 @@ app.get('/Logout', (req, res) => {
     res.redirect('/');
 })
 
-app.get('/Admin',requireAdmin, (req, res) => {
+app.get('/AdminPanel',requireAdmin, (req, res) => {
     res.send('Admin page here');
 })
+app.get('/Upload',requireAdmin, (req, res) => {
+    res.render('Upload.ejs');
+})
 
+app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
+    const {code , title ,desc , tags , branch ,sem }= req.body;
+    // console.log(req.file);
+    // console.log(req.body);
+    let date = new Date().toLocaleDateString();
+    await content.create({
+        coursecode: code,
+        title,
+        description:desc,
+        type:path.extname(req.file.originalname).slice(1).toUpperCase(),
+        uploadedBy:jwt.verify(req.cookies.session, process.env.SECRET).name,
+        uploadedAt:date,
+        branch,
+        semester: sem,
+        path:req.file.filename,
+        tags,
+    })
+    res.redirect('Upload');
+})
 
 
 // app.get('/Login', (req, res) => {

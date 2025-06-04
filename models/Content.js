@@ -8,10 +8,11 @@ const contentSchema = mongoose.Schema({
     description:String,
     type:String,
     uploadedBy:String,
-    uploadedAt:Date,
+    uploadedAt:String,
     branch: String,
     semester: String,
     tags:String,
+    path: String,
     popularity: { type: Number, default: 0 }
 
 })

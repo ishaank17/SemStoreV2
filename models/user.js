@@ -14,4 +14,4 @@ const userSchema = mongoose.Schema({
     role:String
 })
 
-module.exports= mongoose.model('SemStore', userSchema);
+module.exports= mongoose.model('user', userSchema);

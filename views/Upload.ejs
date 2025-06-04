@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#2196f3" >
+    <title>Upload - Sem-Store</title>
+    <!-- Tailwind CSS -->
+    <link href="/src/Style.css" rel="stylesheet">
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="SemStore" />
+
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+
+<body class=" min-h-screen  flex flex-col text-gray-800">
+<%- include("navbar.ejs")%>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <form method="post" action="UploadFile" enctype="multipart/form-data" class="bg-white rounded-2xl shadow-2xl mx-auto max-w-[80vw] space-y-4 p-6">
+        <h2 class="text-center text-xl font-extrabold ">Enter Your Details</h2>
+        <div class="flex w-full ">
+            <div class="w-full mr-3">
+                <label for="code" class="block font-semibold mb-1" >Course Code:</label>
+                <input type="text" id="code" name="code" placeholder="eg. ES114" class="block border border-gray-300  w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+            <div class="w-full ml-3">
+                <label for="title" class="block font-semibold mb-1" >Title:</label>
+                <input type="text" id="title" name="title" placeholder="eg. Endsems" class="block border border-gray-300  w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            </div>
+
+        </div>
+        <div class="flex w-full ">
+            <div class="w-full mr-3">
+                <label for="desc" class="block font-semibold mb-1">Description:</label>
+                <textarea  id="desc" name="desc" rows="3" placeholder="Type Here" class="block border border-gray-300 w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+            </div>
+            <div class="w-full ml-3">
+                <label for="tags" class="block font-semibold mb-1">Tags:</label>
+                <textarea  id="tags" name="tags" rows="3" placeholder="Type Here" class="block border border-gray-300 w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+            </div>
+        </div>
+        <div class="flex w-full ">
+            <div class="w-full mr-3">
+                <label for="branch" class="block font-semibold mb-1">Branch:</label>
+                <select id="branch" name="branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                    <option value="" disabled selected hidden>Select the branch</option>
+                    <option value="" >None</option>
+                    <option value="CSE">CSE</option>
+                    <option value="AI">AI</option>
+                    <option value="EE">EE</option>
+                    <option value="ICD">ICDT</option>
+                    <option value="ME">ME</option>
+                    <option value="CH">CH</option>
+                    <option value="CE">CE</option>
+                    <option value="MSE">MSE</option>
+                </select>
+            </div>
+            <div class="w-full ml-3">
+                <label for="sem" class="block font-semibold mb-1">Semester:</label>
+                <select id="sem" name="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">
+                    <option value="" hidden disabled selected>Semester</option>
+                    <option value="" >None</option>
+                    <option value="sem1">Semester-1</option>
+                    <option value="sem2">Semester-2</option>
+                </select>
+            </div>
+        </div>
+        <div class="w-full mb-4">
+            <label for="file_input" class="block font-semibold mb-1">
+                Upload file:
+            </label>
+            <input
+                    type="file"
+                    name="file_input"
+                    class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50  p-4"
+            >
+        </div>
+
+
+
+
+        <button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 ">Submit</button>
+    </form>
+
+
+</main>
+
+<%- include("footer.ejs")%>
+
+</body>
+
+</html>
+
+
+
+
+
+
+
+
+
+

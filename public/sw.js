@@ -37,16 +37,16 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
-    // console.log("Fetch:",event);
-    event.respondWith(
-        caches.match(event.request).then(response =>  {
-            return response || fetch(event.request);
-        }).catch((e) => {
-            // if (event.request.url.indexOf('.ejs')>-1) {
-            console.log('Fetch failed this one so offline loaded :', event.request);
-            console.log(event.request.url.indexOf('.ejs') , e)
-                return caches.match("/Offline.html");
-            // }
-        })
-    );
+
+    // event.respondWith(
+    //     caches.match(event.request).then(response =>  {
+    //         return response || fetch(event.request);
+    //     }).catch((e) => {
+    //         // if (event.request.url.indexOf('.ejs')>-1) {
+    //         console.log('Fetch failed this one so offline loaded :', event.request);
+    //         console.log(event.request.url.indexOf('.ejs') , e)
+    //             return caches.match("/Offline.html");
+    //         // }
+    //     })
+    // );
 });
