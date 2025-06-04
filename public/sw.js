@@ -10,8 +10,8 @@ const urlsToCache = [
     '/icons/iitgn-logo.png.144x144.png',
     '/contents/Amplifiers- Sedra and Smith Reference.pdf',
     '/images/iitgn-logo.png',
-    'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap'
-
+    'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap',
+    '/Offline'
 ];
 
 
@@ -41,6 +41,6 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then(response =>  {
             return response || fetch(event.request);
-        }),
-    )
+        }).catch(() => caches.match("Offline"))
+    );
 });
