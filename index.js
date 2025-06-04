@@ -114,6 +114,7 @@ app.post('/Create', async (req, res) => {
         batch:batch.slice(-2),
         bio
     })
+
     res.redirect('/Home');
 })
 
