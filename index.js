@@ -157,9 +157,6 @@ app.get('/Logout', (req, res) => {
 app.get('/Admin',requireAdmin, (req, res) => {
     res.send('Admin page here');
 })
-app.get('/Offline', (req, res) => {
-    res.render('Offline.ejs');
-})
 
 
 

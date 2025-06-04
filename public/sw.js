@@ -11,7 +11,7 @@ const urlsToCache = [
     '/contents/Amplifiers- Sedra and Smith Reference.pdf',
     '/images/iitgn-logo.png',
     'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap',
-    '/Offline'
+    '/Offline.html'
 ];
 
 
@@ -41,6 +41,12 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(
         caches.match(event.request).then(response =>  {
             return response || fetch(event.request);
-        }).catch(() => caches.match("Offline"))
+        }).catch((e) => {
+            // if (event.request.url.indexOf('.ejs')>-1) {
+            console.log('Fetch failed this one so offline loaded :', event.request);
+            console.log(event.request.url.indexOf('.ejs') , e)
+                return caches.match("/Offline.html");
+            // }
+        })
     );
 });
