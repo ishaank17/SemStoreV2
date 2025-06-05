@@ -248,7 +248,9 @@
 
 
 
-<script>
+<script type="module">
+    import { findFile } from '/js/db.js';
+    import { saveFile } from '/js/db.js';
     console.log(window.innerWidth)
     const isMobile = window.innerWidth < 640;
     const searchInput = document.getElementById('search');
@@ -276,52 +278,215 @@
             order
         });
         console.log(params)
+        // fetch(`/Home/Search?${params}`)
+        //     .then(res => res.json())
+        //     .then(data =>  {
+        //         resultsContainer.innerHTML = data.map(resource => {
+        //                 console.log(resource.coursecode,findFile(resource._id))
+        //             findFile(resource._id).then(exists => {
+        //                 if (exists) {
+        //                     //offline
+        //                     return `
+        //         <tr class=" text-gray-700 bg-white hover:bg-gray-200" >
+        //             <td class="p-3 text-sm  whitespace-nowrap font-medium">${resource.coursecode}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap"><a href="${resource.path}">${resource.title}</a></td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.description}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.type}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedBy}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedAt}</td>
+        //             <td>
+        //                 <div class="flex flex-row gap-6" >
+        //                     <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this ,'${resource._id}');" id="cache-btn" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>
+        //                     <img src="images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
+        //                 </div>
+        //             </td>
+        //         </tr>`
+        //                 } else {
+        //                     //not offline
+        //                     return `
+        //         <tr class=" text-gray-700 bg-white hover:bg-gray-200" >
+        //             <td class="p-3 text-sm  whitespace-nowrap font-medium">${resource.coursecode}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap"><a href="${resource.path}">${resource.title}</a></td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.description}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.type}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedBy}</td>
+        //             <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedAt}</td>
+        //             <td>
+        //                 <div class="flex flex-row gap-6" >
+        //                     <button disabled type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this ,'${resource._id}');" id="cache-btn" class="flex items-center gap-2 bg-gray-400  text-white px-3 py-1.5 rounded-lg text-sm font-medium "><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>
+        //                     <img src="images/tick.png" alt="Available offline" style="width:30px;height:30px;">
+        //                 </div>
+        //             </td>
+        //         </tr>`
+        //                 }
+        //             })
+        //         }).join('');
+        //         resultsContainer2.innerHTML = data.map(resource => {
+        //             console.log(resource.coursecode,findFile(resource._id))
+        //             findFile(resource._id).then(exists => {
+        //                 if (exists) {
+        //                     //offline
+        //                     return `
+        //         <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
+        //         <div class="flex items-center justify-between">
+        //             <a href="${resource.path}">
+        //                 <div class="flex flex-row space-x-2 ">
+        //                     <span class="font-semibold text-gray-800">${resource.coursecode}</span>
+        //                     <span class="text-gray-600 text-xs">${resource.title}</span>
+        //                 </div>
+        //             </a>
+        //             <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+        //                 Make Available Offline
+        //             </button>
+        //         </div>
+        //         <a href="./contents/${resource.path}">
+        //             <p class="text-gray-700 text-sm">${resource.description}</p>
+        //             <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+        //                 <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">${resource.type}</span>
+        //                 <span>Uploaded By: ${resource.uploadedBy}</span>
+        //                 <span>${resource.uploadedAt}</span>
+        //             </div>
+        //         </a>
+        //     </div>`
+        //
+        //                 } else {
+        //                     //not offline
+        //                     return `
+        //         <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
+        //         <div class="flex items-center justify-between">
+        //             <a href="${resource.path}">
+        //                 <div class="flex flex-row space-x-2 ">
+        //                     <span class="font-semibold text-gray-800">${resource.coursecode}</span>
+        //                     <span class="text-gray-600 text-xs">${resource.title}</span>
+        //                 </div>
+        //             </a>
+        //             <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+        //                 Make Available Offline
+        //             </button>
+        //         </div>
+        //         <a href="./contents/${resource.path}">
+        //             <p class="text-gray-700 text-sm">${resource.description}</p>
+        //             <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+        //                 <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">${resource.type}</span>
+        //                 <span>Uploaded By: ${resource.uploadedBy}</span>
+        //                 <span>${resource.uploadedAt}</span>
+        //             </div>
+        //         </a>
+        //     </div>`
+        //                 }
+        //             })
+        //
+        //         }).join('');
+        //     });
+
+
+
         fetch(`/Home/Search?${params}`)
             .then(res => res.json())
-            .then(data => {
-                resultsContainer.innerHTML = data.map(resource => {
-                        console.log(resource.coursecode)
+            .then(async data => {
+                // Map to an array of promises resolving to strings
+                const rows = await Promise.all(data.map(async resource => {
+                    const exists = await findFile(resource._id);
+                    console.log(exists);
+                    if (exists) {
+                        // offline version
                         return `
-                <tr class=" text-gray-700 bg-white hover:bg-gray-200" >
-                    <td class="p-3 text-sm  whitespace-nowrap font-medium">${resource.coursecode}</td>
-                    <td class="p-3 text-sm  whitespace-nowrap"><a href="${resource.path}">${resource.title}</a></td>
-                    <td class="p-3 text-sm  whitespace-nowrap">${resource.description}</td>
-                    <td class="p-3 text-sm  whitespace-nowrap">${resource.type}</td>
-                    <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedBy}</td>
-                    <td class="p-3 text-sm  whitespace-nowrap">${resource.uploadedAt}</td>
-                    <td>
-                        <div class="flex flex-row gap-6" >
-                            <button type="button" onclick="dwload()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>
-                            <img src="images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
+          <tr class="text-gray-700 bg-white hover:bg-gray-200">
+            <td class="p-3 text-sm whitespace-nowrap font-medium">${resource.coursecode}</td>
+            <td class="p-3 text-sm whitespace-nowrap"><a href="${resource.path}">${resource.title}</a></td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.description}</td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.type}</td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedBy}</td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedAt}</td>
+            <td>
+              <div class="flex flex-row gap-6">
+                <button disabled type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this ,'${resource._id}');" id="cache-btn" class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                </button>
+                <img src="images/tick.png" alt="Available offline" style="width:30px;height:30px;">
+              </div>
+            </td>
+          </tr>`;
+                    } else {
+                        // not offline version
+                        return `
+          <tr class="text-gray-700 bg-white hover:bg-gray-200">
+            <td class="p-3 text-sm whitespace-nowrap font-medium">${resource.coursecode}</td>
+            <td class="p-3 text-sm whitespace-nowrap"><a href="${resource.path}">${resource.title}</a></td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.description}</td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.type}</td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedBy}</td>
+            <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedAt}</td>
+            <td>
+              <div class="flex flex-row gap-6">
+                <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this ,'${resource._id}');" id="cache-btn" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                </button>
+                <img src="images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
+              </div>
+            </td>
+          </tr>`;
+                    }
+                }));
+
+                resultsContainer.innerHTML = rows.join('');
+                const rows2 = await Promise.all(data.map(async resource => {
+                    const exists = await findFile(resource._id);
+                    console.log(exists);
+                    if (exists) {
+                                    //offline
+                                    return `
+                        <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
+                        <div class="flex items-center justify-between">
+                            <a href="${resource.path}">
+                                <div class="flex flex-row space-x-2 ">
+                                    <span class="font-semibold text-gray-800">${resource.coursecode}</span>
+                                    <span class="text-gray-600 text-xs">${resource.title}</span>
+                                </div>
+                            </a>
+                            <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                                 Available Offline
+                            </button>
                         </div>
-                    </td>
-                </tr>`
-                }).join('');
-                resultsContainer2.innerHTML = data.map(resource => {
-                    console.log(resource.coursecode)
-                    return `
-                <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
-                <div class="flex items-center justify-between">
-                    <a href="${resource.path}">
-                        <div class="flex flex-row space-x-2 ">
-                            <span class="font-semibold text-gray-800">${resource.coursecode}</span>
-                            <span class="text-gray-600 text-xs">${resource.title}</span>
+                        <a href="${resource.path}">
+                            <p class="text-gray-700 text-sm">${resource.description}</p>
+                            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                                <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">${resource.type}</span>
+                                <span>Uploaded By: ${resource.uploadedBy}</span>
+                                <span>${resource.uploadedAt}</span>
+                            </div>
+                        </a>
+                    </div>`
+
+                                } else {
+                                    //not offline
+                                    return `
+                        <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">
+                        <div class="flex items-center justify-between">
+                            <a href="${resource.path}">
+                                <div class="flex flex-row space-x-2 ">
+                                    <span class="font-semibold text-gray-800">${resource.coursecode}</span>
+                                    <span class="text-gray-600 text-xs">${resource.title}</span>
+                                </div>
+                            </a>
+                            <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                                Make Available Offline
+                            </button>
                         </div>
-                    </a>
-                    <button type="button" onclick="dwload()" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
-                        Make Available Offline
-                    </button>
-                </div>
-                <a href="./contents/${resource.path}">
-                    <p class="text-gray-700 text-sm">${resource.description}</p>
-                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
-                        <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">PDF</span>
-                        <span>By: ${resource.uploadedBy}</span>
-                        <span>${resource.uploadedAt }</span>
-                    </div>
-                </a>
-            </div>`
-                }).join('');
+                        <a href="${resource.path}">
+                            <p class="text-gray-700 text-sm">${resource.description}</p>
+                            <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
+                                <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">${resource.type}</span>
+                                <span>Uploaded By: ${resource.uploadedBy}</span>
+                                <span>${resource.uploadedAt}</span>
+                            </div>
+                        </a>
+                    </div>`
+                                }
+                }));
+
+                resultsContainer2.innerHTML = rows2.join('');
+
             });
     }
 
@@ -345,6 +510,60 @@
         // console.log("feth")
         fetchResults();     // trigger fetch manually if user presses Enter or clicks button
     });
+
+    async function cachefile(fileId,fileTitle,btn,ID) {
+        try {
+
+            // 1. Get the filename from backend
+            const response = await fetch(`/api/file/${fileId}`);
+            const { fileName } = await response.json();
+
+            const fileUrl = `/contents/${fileName}`; // Custom cache key
+            saveFile({title:fileTitle,link:fileUrl,oid:ID});
+            // 2. Fetch the actual file content
+            const fileResponse = await fetch(`${fileUrl}`); // real file path
+            if (!fileResponse.ok) throw new Error("Failed to fetch file");
+
+            // 3. Cache with friendly name
+            const cache = await caches.open("offline-files");
+            await cache.put(fileUrl, fileResponse.clone());
+            const res=await fetch(`/delete/${fileName}`, { method: 'POST' });
+
+            const img = btn.parentElement.querySelector('img');
+            if (img) {
+                img.src = 'images/tick.png';
+                img.alt = 'Available offline';
+            } else {
+                // No img found (mobile?), update button text instead
+                btn.textContent = "Available Offline";
+            }
+            btn.disabled=true;
+            btn.classList.remove('bg-blue-600', 'hover:bg-blue-700' ,'transition');
+            btn.classList.add('bg-gray-400');
+            console.log("✅ File cached as:", fileUrl,"\n And deletion from local :",res);
+
+        } catch (err) {
+            console.error("❌ Failed to cache file:", err);
+        }
+    }
+    window.cachefile = cachefile;
+
+
+    function extractDriveId(url) {
+        const patterns = [
+            /\/d\/([a-zA-Z0-9_-]+)/,             // /d/FILE_ID
+            /id=([a-zA-Z0-9_-]+)/,               // id=FILE_ID
+            /\/folders\/([a-zA-Z0-9_-]+)/        // /folders/FOLDER_ID
+        ];
+
+        for (const pattern of patterns) {
+            const match = url.match(pattern);
+            if (match && match[1]) return match[1];
+        }
+
+        return null; // No ID found
+    }
+    window.extractDriveId = extractDriveId;
 </script>
 <%- include("footer.ejs")%>
 </body>

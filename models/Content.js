@@ -4,6 +4,7 @@ const DB_NAME=process.env.DB_NAME;
 const mongoose = require('mongoose');
 mongoose.connect(`${MONGO_URL}`,{dbName: `${DB_NAME}`})
 const contentSchema = mongoose.Schema({
+
     coursecode:String,
     title:String,
     description:String,

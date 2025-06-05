@@ -12,7 +12,6 @@ const {requireLogin}=require('./models/LoginCheck');
 const {requireAdmin}=require('./models/AdminCheck');
 const multer = require('multer');
 const crypto = require('crypto');
-const db=require('./public/db');
 const mime = require('mime-types');
 
 
@@ -106,6 +105,43 @@ function uploadGoogle (fname) {
             return url;
         }).catch(e=>console.log("Error while uploading:",e));
 }
+async function downloadFile(fileId, destination) {
+    const auth = new google.auth.GoogleAuth({
+        keyFile:'apikeys.json', // Replace with path to your JSON file
+        scopes: ['https://www.googleapis.com/auth/drive.readonly'],
+    });
+
+    const drive = google.drive({ version: 'v3', auth });
+    // console.log("Here",fileId);
+    const { data: metadata } = await drive.files.get({fileId} );
+    // console.log("Metadata",metadata);
+    const fileName = metadata.name ;
+    const fullDest = path.resolve(destination, fileName);
+    // console.log("FUll DESt",fullDest);
+    const res = await drive.files.get(
+        { fileId, alt: 'media' },
+        { responseType: 'stream' }
+    );
+
+    const dest = fs.createWriteStream(fullDest);
+    await new Promise((resolve, reject) => {
+        res.data
+            .on('end', () => {
+                console.log('✅ File downloaded successfully');
+                resolve();
+            })
+            .on('error', err => {
+                console.error('❌ Error downloading file', err);
+                reject(err);
+            })
+            .pipe(dest);
+    });
+    return fullDest;
+}
+
+
+
+
 //SESSION MIDDLE WARE
 app.use((req, res, next) => {
     try {
@@ -126,6 +162,7 @@ app.use((req, res, next) => {
 
 //GOOGLE OAUTH2
 const {OAuth2Client, JWT} = require('google-auth-library');
+const {file} = require("googleapis/build/src/apis/file");
 
 app.get('/', (req, res) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:80');
@@ -263,8 +300,13 @@ app.get('/Upload',requireAdmin, (req, res) => {
 app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
     const {code , title ,desc , tags , branch ,sem }= req.body;
     const url= await uploadGoogle(req.file.filename);
-    fs.unlinkSync(`public/contents/${req.file.filename}`)
-
+    fs.unlink(`public/contents/${req.file.filename}`, (err) => {
+        if (err) {
+            console.error("Failed to delete file after upload:", err);
+        } else {
+            console.log("File deleted successfully after upload");
+        }
+    });
     let date = new Date().toLocaleDateString();
     await content.create({
         coursecode: code,
@@ -281,7 +323,39 @@ app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
     console.log("done uploading")
     res.redirect('Upload');
 })
+app.get("/contents/:file", (req, res) => {
+    const fullPath = path.resolve("public/contents", req.params.file);
+    res.sendFile(fullPath);
+});
 
+app.get("/api/file/:id", async (req, res) => {
+    try {
+        const filePath = await downloadFile(req.params.id, "public/contents");
+        const fileName = path.basename(filePath);
+        console.log(fileName);
+        res.json({ fileName });
+    } catch (err) {
+        res.status(500).json({ error: "Failed to get file metadata" });
+    }
+});
+app.post('/delete/:filename', async (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.resolve('public/contents', filename);
 
+    try {
+        fs.unlink(filePath, (err) => {
+            if (err) {
+                console.error("Failed to delete file after cache:", err);
+            } else {
+                console.log("File deleted successfully after cache");
+            }
+        });
+        console.log(`Deleted file: ${filename}`);
+        res.json({ success: true });
+    } catch (err) {
+        console.error(`Error deleting file: ${filename}`, err);
+        res.status(500).json({ error: 'Failed to delete file' });
+    }
+});
 app.listen(80)
 

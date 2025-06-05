@@ -1,4 +1,5 @@
-const CACHE_NAME = 'sem-store-v4';
+
+const CACHE_NAME = 'sem-store-v5';
 const urlsToCache = [
     '/manifest.json',
     '/startSW.js',
