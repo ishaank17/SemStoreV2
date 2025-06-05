@@ -43,7 +43,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-
+console.log( process.env.STORAGE_KEY.replace(/\\n/g, '\n'))
 //UPLOAD TO GOOGLE
 const fs=require('fs');
 const {google} = require('googleapis');
