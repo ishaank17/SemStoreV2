@@ -9,14 +9,17 @@
   "private": true,
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "cloudinary": "^2.6.1",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
     "google-auth-library": "^9.15.1",
+    "googleapis": "^149.0.0",
     "idb": "^8.0.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
     "multer": "^2.0.1"
+
   }
 }

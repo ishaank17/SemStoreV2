@@ -13,6 +13,7 @@ const {requireAdmin}=require('./models/AdminCheck');
 const multer = require('multer');
 const crypto = require('crypto');
 const db=require('./public/db');
+const mime = require('mime-types');
 
 
 app.use(express.json())
@@ -21,6 +22,9 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname,"public")));
 app.set('view engine', 'ejs')
 
+
+
+// MULTER
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, './public/contents')
@@ -38,12 +42,71 @@ const storage = multer.diskStorage({
 
     }
 })
-
 const upload = multer({ storage: storage })
 
 
+//UPLOAD TO GOOGLE
+const fs=require('fs');
+const {google} = require('googleapis');
+const apikeys= {
+    "type": "service_account",
+    "project_id": "oauth-461019",
+    "private_key_id": `${process.env.STORAGE_KEY_ID}`,
+    "private_key": process.env.STORAGE_KEY,
+    "client_email": `${process.env.STORAGE_CLIENT_EMAIL}`,
+    "client_id":process.env.STORAGE_CLIENT_ID ,
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": process.env.STORAGE_CLIENT_CERT_URL,
+    "universe_domain": "googleapis.com"
+}
+const SCOPE=['https://www.googleapis.com/auth/drive'];
+async function authorize() {
+    const jwtClient = new google.auth.JWT(
+        apikeys.client_email,
+        null,
+        apikeys.private_key,
+        SCOPE
+    );
+    await jwtClient.authorize();
+    return jwtClient;
+}
+async function uploadFile(authClient,filename){
+    return new Promise((resolve,rejected)=>{
+        const drive = google.drive({version:'v3',auth:authClient});
+        const mimeType = mime.lookup(filename) || 'application/octet-stream';
+        var fileMetaData = {
+            name:`${filename}`,
+            parents:['1W9QcqqyhnKRsC7bN5j_--qdSgxXx8sxO'] // A folder ID to which file will get uploaded
+        }
 
-
+        drive.files.create({
+            resource:fileMetaData,
+            media:{
+                body: fs.createReadStream(`public/contents/${filename}`), // files that will get uploaded
+                mimeType:mimeType
+            },
+            fields:'id'
+        },function(error,file){
+            if(error){
+                return rejected(error)
+            }
+            resolve(file);
+        })
+    });
+}
+function uploadGoogle (fname) {
+    return authorize()
+        .then(auth => uploadFile(auth, fname))
+        .then(file => {
+            const fileId = file.data.id;
+            const url = `https://drive.google.com/file/d/${fileId}/view`;
+            console.log("Drive URL:", url);
+            return url;
+        }).catch(e=>console.log("Error while uploading:",e));
+}
+//SESSION MIDDLE WARE
 app.use((req, res, next) => {
     try {
         const decoded = jwt.verify(req.cookies.session, process.env.SECRET);
@@ -61,8 +124,8 @@ app.use((req, res, next) => {
 });
 
 
-
-const {OAuth2Client} = require('google-auth-library');
+//GOOGLE OAUTH2
+const {OAuth2Client, JWT} = require('google-auth-library');
 
 app.get('/', (req, res) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:80');
@@ -87,6 +150,9 @@ async function getUserData(accessToken) {
     return await response.json();
 }
 
+
+
+//REDIRECTS OF PAGES
 app.get('/Login', async (req, res) => {
     const code = req.query.code;
     const redirectURL = `${BASE_URL}/Login`;
@@ -196,8 +262,9 @@ app.get('/Upload',requireAdmin, (req, res) => {
 
 app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
     const {code , title ,desc , tags , branch ,sem }= req.body;
-    // console.log(req.file);
-    // console.log(req.body);
+    const url= await uploadGoogle(req.file.filename);
+    fs.unlinkSync(`public/contents/${req.file.filename}`)
+
     let date = new Date().toLocaleDateString();
     await content.create({
         coursecode: code,
@@ -208,45 +275,13 @@ app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
         uploadedAt:date,
         branch,
         semester: sem,
-        path:req.file.filename,
+        path:url,
         tags,
     })
+    console.log("done uploading")
     res.redirect('Upload');
 })
 
-
-// app.get('/Login', (req, res) => {
-//     res.send('Login file here');
-// })
-// app.post('/Create', async (req, res) => {
-//     let{phone,batch,branch,bio}=req.body;
-//     let createduser = await userModel.create({
-//         phone: phone,
-//         batch: batch.slice(-2),
-//         branch: branch,
-//         bio: bio,
-//     });
-//
-//     let session= jwt.sign({email:"ikk@gmail.com"},"secret");
-//     let decrypt= jwt.verify(req.cookies.email,"secret");
-//     res.cookie('email',session)
-//     res.send(createduser);
-//     console.log(req.cookies);
-//     console.log(decrypt);
-// })
-
-
-
-
-// app.get('/update', async (req, res) => {
-//     const updated= await userModel.findOneAndUpdate({phone:"ishaan"}, {phone:"ishaan2"} )
-//     res.send(updated);
-// })
-
-// app.get('/Profiles/:rollno', (req, res) => {
-//
-//     res.send('Hello,'+ req.params.rollno);
-// })
 
 app.listen(80)
 

@@ -10,7 +10,8 @@ const urlsToCache = [
     // '/contents/Amplifiers- Sedra and Smith Reference.pdf',
     '/images/iitgn-logo.png',
     'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap',
-    '/Offline.html'
+    '/Offline.html',
+
 ];
 
 
