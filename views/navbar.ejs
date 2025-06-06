@@ -5,11 +5,12 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         <div class="flex items-center gap-3" >
             <a href="/"><img src="../images/iitgn-logo.png" alt="IITGN Logo" class="h-10 w-10" ></a>
-            <h1 class="text-xl font-semibold text-blue-600">Sem-Store</h1>
+            <a href="/"><h1 class="text-xl font-semibold text-blue-600">Sem-Store</h1></a>
         </div>
         <ul class="flex space-x-4">
-            <li><a href="#explore" class="text-blue-600 hover:text-blue-800">Explore</a></li>
+            <li><a href="/Home" class="text-blue-600 hover:text-blue-800">Explore</a></li>
             <li><a href="#about" class="text-blue-600 hover:text-blue-800">About</a></li>
+            <li><a href="/Downloads" class="text-blue-600 hover:text-blue-800">Downloaded Files</a></li>
             <% if (role==="Contributor" || role==="Admin") { %>
                 <li><a href="/Upload" class="text-blue-600 hover:text-blue-800">Upload Page</a></li>
             <% } %>

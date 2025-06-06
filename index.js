@@ -43,7 +43,6 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage: storage })
 
-console.log( process.env.STORAGE_KEY.replace(/\\n/g, '\n'))
 //UPLOAD TO GOOGLE
 const fs=require('fs');
 const {google} = require('googleapis');
@@ -292,6 +291,9 @@ app.get('/Logout', (req, res) => {
 
 app.get('/AdminPanel',requireAdmin, (req, res) => {
     res.send('Admin page here');
+})
+app.get('/Downloads',requireAdmin, (req, res) => {
+    res.render('Downloads.ejs');
 })
 app.get('/Upload',requireAdmin, (req, res) => {
     res.render('Upload.ejs');

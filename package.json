@@ -4,10 +4,18 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "npm run build && node index.js",
+    "dev": "concurrently \"npm run tailwind-watch\" \"npm run server\"",
+    "tailwind-watch": "tailwindcss -i ./public/src/Input.css -o ./public/src/op.css --watch",
+    "server": "nodemon index.js",
+    "build": "tailwindcss -i ./public/src/Input.css -o ./public/src/op.css --minify"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "private": true,
   "dependencies": {
+    "@tailwindcss/cli": "^4.1.8",
     "bcrypt": "^6.0.0",
     "cloudinary": "^2.6.1",
     "cookie-parser": "^1.4.7",
@@ -19,6 +27,8 @@
     "idb": "^8.0.3",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
-    "multer": "^2.0.1"
+    "multer": "^2.0.1",
+    "tailwindcss": "^4.1.8"
   }
+
 }

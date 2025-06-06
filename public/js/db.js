@@ -24,3 +24,9 @@ export async function findFile(fileID) {
     if(result) return true;
     else return false;
 }
+export async function getAll() {
+    const db = await dbPromise;
+    const result = await db.getAll('fileData');
+    return result;
+
+}
