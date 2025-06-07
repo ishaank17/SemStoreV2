@@ -47,17 +47,58 @@ self.addEventListener('activate', (event) => {
    )
 });
 
-self.addEventListener('fetch', (event) => {
-    // console.log("Fetching");
+// self.addEventListener('fetch', (event) => {
+//
+//     const url = new URL(event.request.url);
+//     console.log(url,url.pathname,url.searchParams.has('code') );
+//     if (url.pathname === '/Login' && url.searchParams.has('code')) {
+//         console.log("Bypassing Service Worker for OAuth callback:", url.href);
+//         return; // Don't intercept, let the browser handle it
+//     }
+//     event.respondWith(
+//         caches.match(event.request).then(response =>  {
+//             return response || fetch(event.request);
+//         }).catch((e) => {
+//             // if (!(url.pathname === '/Login' && url.searchParams.has('code'))) {
+//             console.log('Fetch failed this one so offline loaded :', event.request);
+//             console.log(event.request.url.indexOf('.ejs') , e)
+//                 return caches.match("/Offline.html");
+//             // }
+//
+//         })
+//     );
+//
+//
+//
+// });
+
+self.addEventListener('fetch', event => {
+     const url = new URL(event.request.url);
+     // console.log("heere1" ,caches.match(event.request), fetch(event.request) );
+    //
+    // // ✅ Skip Service Worker handling for OAuth callback
+    if ((url.pathname === '/Login' && url.searchParams.has('code'))) {
+        console.log("Bypassing Service Worker for OAuth callback:", url.href);
+        return; // ❗ Very important: prevents SW from interfering with OAuth
+    }
+    //
     event.respondWith(
-        caches.match(event.request).then(response =>  {
-            return response || fetch(event.request);
-        }).catch((e) => {
-            // if (event.request.url.indexOf('.ejs')>-1) {
-            console.log('Fetch failed this one so offline loaded :', event.request);
-            console.log(event.request.url.indexOf('.ejs') , e)
-                return caches.match("/Offline.html");
-            // }
+
+        caches.match(event.request).then(cachedResponse => {
+
+            return cachedResponse || fetch(event.request).catch((err) => {
+                console.warn('Fetch failed:', event.request.url, err);
+                console.log("heere2" ,event.request.mode, caches.match('/Offline.html') );
+                // ✅ Serve Offline.html only for navigations (HTML pages)
+                if (event.request.mode === 'navigate') {
+                    return caches.match('/Offline.html');
+                }
+
+                return new Response('Network error', {
+                    status: 503,
+                    statusText: 'Service Unavailable'
+                });
+            });
         })
     );
 });

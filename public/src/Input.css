@@ -1,8 +1,8 @@
 
 @import "tailwindcss";
-@import "tailwindcss/preflight";
+
 @tailwind utilities;
-@layer properties;
+
 
 @theme{
     --color-blue-600:#1a71c9;

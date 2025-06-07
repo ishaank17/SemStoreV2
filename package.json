@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "concurrently \"npm run tailwind-watch\" \"npm run server\"",
-    "tailwind-watch": "tailwindcss -i ./public/src/Input.css -o ./public/src/op.css --watch",
+    "tailwind-watch": "tailwindcss -i ./public/src/Input.css -o ./public/src/new.css --watch   ",
     "server": "nodemon index.js",
     "build": "tailwindcss -i ./public/src/Input.css -o ./public/src/op.css --minify"
   },

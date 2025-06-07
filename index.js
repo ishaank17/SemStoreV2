@@ -180,7 +180,6 @@ app.get('/', (req, res) => {
     });
     res.render('index' , {link: authorizeUrl});
 })
-
 async function getUserData(accessToken) {
     const response = await fetch(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
     return await response.json();
@@ -210,7 +209,6 @@ app.get('/Login', async (req, res) => {
     let row= await userModel.findOne({rollno:data.family_name})
 
     // console.log(row)
-
     if(!row) {
         let session= jwt.sign({rollno:data.family_name,
             name: data.given_name,
@@ -234,11 +232,9 @@ app.get('/Login', async (req, res) => {
             profilePhoto: row.profilePhoto,
             role:row.role},process.env.SECRET);
         res.cookie('session',session);
-        res.redirect('/Home');
+        res.redirect('Home');
     }
 })
-
-
 app.post('/Create', async (req, res) => {
     let {phone,branch ,batch ,bio}= req.body;
     const data = await jwt.verify(req.cookies.session, process.env.SECRET);
@@ -251,11 +247,15 @@ app.post('/Create', async (req, res) => {
 
     res.redirect('/Home');
 })
-
 app.get('/Home',  requireLogin,async(req, res) => {
     res.render('Home.ejs');
 
 })
+app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
+    const contentNo= await content.countDocuments();
+    const usersNo= await userModel.countDocuments();
+    console.log(contentNo,usersNo);
+});
 app.get('/Home/search', requireLogin, async (req, res) => {
     const { q, semester, branch,order } = req.query;
 
@@ -272,34 +272,36 @@ app.get('/Home/search', requireLogin, async (req, res) => {
     if (branch) filter.branch = branch;
     // console.log(typeof (order));
     // console.log("Filter:", JSON.stringify(filter, null, 2));
-    const results = await content.find(filter).sort({ popularity: parseInt(order) })   .limit(20);
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }).limit(20);
     res.json(results);
 });
 
 app.get('/Signup', (req, res) => {
     res.render('Signup.ejs');
 })
+
+
 app.get('/Error', (req, res) => {
     const error = req.query.error;
     res.render('error', { error });
 });
-
 app.get('/Logout', (req, res) => {
     res.cookie('session', "")
     res.redirect('/');
 })
-
 app.get('/AdminPanel',requireAdmin, (req, res) => {
-    res.send('Admin page here');
+    res.render("AdminPanel.ejs");
 })
-app.get('/Downloads',requireAdmin, (req, res) => {
+app.get('/Downloads',requireLogin, (req, res) => {
     res.render('Downloads.ejs');
 })
 app.get('/Upload',requireAdmin, (req, res) => {
     res.render('Upload.ejs');
 })
-
-app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
+app.get('/ref',requireAdmin, (req, res) => {
+    res.render('refpanel.ejs');
+})
+app.post('/UploadFile',requireLogin,upload.single("file_input") ,async (req, res) => {
     const {code , title ,desc , tags , branch ,sem }= req.body;
     const url= await uploadGoogle(req.file.filename);
     fs.unlink(`public/contents/${req.file.filename}`, (err) => {
@@ -325,12 +327,11 @@ app.post('/UploadFile',upload.single("file_input") ,async (req, res) => {
     console.log("done uploading")
     res.redirect('Upload');
 })
-app.get("/contents/:file", (req, res) => {
+app.get("/contents/:file",requireLogin, (req, res) => {
     const fullPath = path.resolve("public/contents", req.params.file);
     res.sendFile(fullPath);
 });
-
-app.get("/api/file/:id", async (req, res) => {
+app.get("/api/file/:id",requireLogin, async (req, res) => {
     try {
         const filePath = await downloadFile(req.params.id, "public/contents");
         const fileName = path.basename(filePath);
@@ -340,7 +341,7 @@ app.get("/api/file/:id", async (req, res) => {
         res.status(500).json({ error: "Failed to get file metadata" });
     }
 });
-app.post('/delete/:filename', async (req, res) => {
+app.post('/delete/:filename',requireLogin, async (req, res) => {
     const filename = req.params.filename;
     const filePath = path.resolve('public/contents', filename);
 
