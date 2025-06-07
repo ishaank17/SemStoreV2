@@ -13,7 +13,7 @@ const {requireAdmin}=require('./models/AdminCheck');
 const multer = require('multer');
 const crypto = require('crypto');
 const mime = require('mime-types');
-
+const mongoose = require('mongoose');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -104,6 +104,9 @@ function uploadGoogle (fname) {
             return url;
         }).catch(e=>console.log("Error while uploading:",e));
 }
+
+
+
 async function downloadFile(fileId, destination) {
     const auth = new google.auth.GoogleAuth({
         keyFile:'apikeys.json', // Replace with path to your JSON file
@@ -137,6 +140,23 @@ async function downloadFile(fileId, destination) {
     });
     return fullDest;
 }
+async function deleteGoogleFile(fileId) {
+    const auth = new google.auth.GoogleAuth({
+        keyFile:'apikeys.json', // Replace with path to your JSON file
+        scopes: ['https://www.googleapis.com/auth/drive.file'],
+    });
+
+    const drive = google.drive({ version: 'v3', auth });
+    return  res = await drive.files.delete({ fileId: fileId });
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -162,6 +182,7 @@ app.use((req, res, next) => {
 //GOOGLE OAUTH2
 const {OAuth2Client, JWT} = require('google-auth-library');
 const {file} = require("googleapis/build/src/apis/file");
+const constants = require("node:constants");
 
 app.get('/', (req, res) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:80');
@@ -254,7 +275,8 @@ app.get('/Home',  requireLogin,async(req, res) => {
 app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
     const contentNo= await content.countDocuments();
     const usersNo= await userModel.countDocuments();
-    console.log(contentNo,usersNo);
+
+    res.json({contents: contentNo,users:usersNo});
 });
 app.get('/Home/search', requireLogin, async (req, res) => {
     const { q, semester, branch,order } = req.query;
@@ -272,7 +294,7 @@ app.get('/Home/search', requireLogin, async (req, res) => {
     if (branch) filter.branch = branch;
     // console.log(typeof (order));
     // console.log("Filter:", JSON.stringify(filter, null, 2));
-    const results = await content.find(filter).sort({ popularity: parseInt(order) }).limit(20);
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
     res.json(results);
 });
 
@@ -360,5 +382,26 @@ app.post('/delete/:filename',requireLogin, async (req, res) => {
         res.status(500).json({ error: 'Failed to delete file' });
     }
 });
+
+app.get('/AdminPanel/Content', async (req, res) => {
+    const users = await content.find(); // can filter role
+    res.render('ManageContent.ejs', { users });
+});
+app.get('/AdminPanel/Users', async (req, res) => {
+    const users = await userModel.find(); // can filter role
+    res.render('ManageUsers.ejs', { users });
+});
+
+app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
+    const result =await deleteGoogleFile(req.params.id);
+    if (result.status === 204) {
+        const resu = await content.deleteOne({ _id: req.params._id });
+        console.log("Successfully deleted Content",resu );
+    } else {
+        console.log('❌ Failed to delete file', result.status, result.data);
+    }
+    res.redirect('/AdminPanel/Contents');
+});
+
 app.listen(80)
 

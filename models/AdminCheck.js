@@ -6,7 +6,7 @@ const requireAdmin = (req, res, next) => {
     // check json web token exists & is verified
     if (token) {
         jwt.verify(token, process.env.SECRET, (err, decodedToken) => {
-            if (decodedToken.role === 'Admin') {
+            if (decodedToken.role === 'Admin' || decodedToken.role === 'Owner') {
                 next();
             } else {
                 res.redirect('/Error?error=Unauthorized%20Access%20!');

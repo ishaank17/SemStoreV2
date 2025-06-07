@@ -16,12 +16,20 @@
     <title>Sem-Store| IITGN</title>
 
     <!-- Tailwind CSS CDN -->
-    <link href="/src/Style.css" rel="stylesheet">
+    <link href="/src/new.css" rel="stylesheet">
 
     <!-- Optional: Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 
-
+    <style>
+        @keyframes slide-in {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in {
+            animation: slide-in 0.4s ease-out;
+        }
+    </style>
 </head>
 
 <body class="min-h-screen  flex flex-col text-gray-800">
@@ -55,23 +63,80 @@
             <p class="mt-2 text-gray-700">PWA features allow offline view of previously loaded resources.</p>
         </div>
     </section>
+    <section class="fixed bottom-4 right-4 z-50 w-full max-w-sm">
+        <div id="notificationPanel" class="hidden bg-white border-l-4 border-blue-500 p-4 shadow-lg rounded-lg animate-slide-in">
+            <div class="flex justify-between items-start gap-2">
+                <div>
+                    <p class="font-semibold text-blue-700">New Notification</p>
+                    <p class="text-sm text-gray-700 mt-1" id="notificationMessage">
+                        Welcome to Sem-Store! Start exploring now.
+                    </p>
+                </div>
+                <button onclick="closeNotification()" class="text-gray-400 hover:text-gray-600">&times;</button>
+            </div>
+        </div>
+    </section>
 </main>
+<!-- Fixed Notification Panel -->
+<aside class="fixed top-24 right-4 w-80 bg-white border border-blue-200 rounded-xl shadow-xl z-50">
+    <div class="p-4 flex items-center justify-between border-b">
+        <h2 class="text-lg font-semibold text-blue-700">Notifications</h2>
+        <button onclick="clearNotifications()" class="text-sm text-blue-500 hover:underline">Clear All</button>
+    </div>
+    <ul id="notificationList" class="max-h-80 overflow-y-auto divide-y">
+        <li class="p-4 text-sm text-gray-700">Welcome to Sem-Store!</li>
+        <li class="p-4 text-sm text-gray-700">New notes uploaded in CS101.</li>
+        <li class="p-4 text-sm text-gray-700">Your contributor access is approved.</li>
+    </ul>
+</aside>
+<button onclick="togglePanel()" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-xl z-50">
+    🔔
+</button>
+<script>
+    function togglePanel() {
+        const panel = document.querySelector("aside");
+        panel.classList.toggle("hidden");
+    }
+</script>
 
-
-<!--<script>-->
-<!--    window.addEventListener('load', function() {-->
-
-<!--        var outputElement = document.getElementById('output');-->
-<!--        -->
-
-<!--        window.addEventListener('beforeinstallprompt', function(e) {-->
-<!--            outputElement.textContent = 'beforeinstallprompt Event fired';-->
-<!--        });-->
-<!--    });-->
-<!--</script>-->
-<!--<?php include_once'footer.php'?>-->
 <%- include('footer.ejs') %>
-<!--<script src="https://cdn.jsdelivr.net/npm/idb@7/build/umd.js"></script>-->
+<script>
+    function showNotification(message) {
+        const panel = document.getElementById('notificationPanel');
+        const msg = document.getElementById('notificationMessage');
+        msg.textContent = message;
+        panel.classList.remove('hidden');
+        setTimeout(() => {
+            panel.classList.add('hidden');
+        }, 5000);
+    }
+    function closeNotification() {
+        document.getElementById('notificationPanel').classList.add('hidden');
+    }
+    // Example trigger
+    window.addEventListener('load', () => {
+        showNotification("You're viewing the latest resources!");
+    });
+
+    function addNotification(msg) {
+        const list = document.getElementById('notificationList');
+        const item = document.createElement('li');
+        item.className = 'p-4 text-sm text-gray-700';
+        item.textContent = msg;
+        list.prepend(item); // add new at top
+    }
+
+    function clearNotifications() {
+        document.getElementById('notificationList').innerHTML = '';
+    }
+
+    // Example: Show one after page load
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            addNotification("System update tonight at 11 PM.");
+        },1000);
+    });
+</script>
 </body>
 
 </html>

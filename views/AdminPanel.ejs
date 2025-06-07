@@ -23,20 +23,20 @@
             <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all">
                 <h2 class="text-xl font-semibold text-blue-600 mb-2">User Management</h2>
                 <p class="text-gray-700 text-sm mb-4">View and manage all registered users, roles and permissions.</p>
-                <a href="/admin/users" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">Manage Users</a>
+                <a href="/AdminPanel/Users" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">Manage Users</a>
             </div>
 
             <!-- Resources Card -->
             <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all">
                 <h2 class="text-xl font-semibold text-blue-600 mb-2">Resource Moderation</h2>
-                <p class="text-gray-700 text-sm mb-4">Approve or reject uploaded files, flag inappropriate content.</p>
-                <a href="/admin/resources" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">Moderate Resources</a>
+                <p class="text-gray-700 text-sm mb-4">Delete files.</p>
+                <a href="/AdminPanel/Content" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">Moderate Resources</a>
             </div>
 
             <!-- Reports Card -->
             <div class="bg-white rounded-2xl shadow-md p-6 hover:shadow-lg transition-all">
                 <h2 class="text-xl font-semibold text-blue-600 mb-2">Reports & Feedback</h2>
-                <p class="text-gray-700 text-sm mb-4">Review user-submitted reports and feedback to improve the platform.</p>
+                <p class="text-gray-700 text-sm mb-4">Review user-submitted reports and feedback to improve the app.</p>
                 <a href="/admin/reports" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition">View Reports</a>
             </div>
         </section>
@@ -48,17 +48,17 @@
         <div class="bg-white rounded-2xl shadow-md p-6">
             <h3 class="text-lg font-semibold text-blue-700 mb-4">Quick Stats</h3>
             <ul class="space-y-2 text-sm">
-                <li><span class="font-medium">Total Users:</span></li>
-                <li><span class="font-medium">Uploaded Resources:</span></li>
-                <li><span class="font-medium">Reports This Week:</span>#Placeholder</li>
+                <li class="font-medium"><span  >Total Users:</span> <span id="users"></span></li>
+                <li class="font-medium"><span  >Uploaded Resources:</span> <span id="resources"></span></li>
+                <li class="font-medium"><span >Reports This Week:</span>#Placeholder</li>
             </ul>
         </div>
         <div class="bg-white rounded-2xl shadow-md p-6">
-            <h3 class="text-lg font-semibold text-blue-700 mb-4">System Notices</h3>
+            <h3 class="text-lg font-semibold text-blue-700 mb-4">Notices</h3>
             <ul class="text-sm text-gray-700 list-disc pl-4 space-y-2">
-                <li>New course tag system deployed.</li>
-                <li>Backend maintenance scheduled this Saturday.</li>
-                <li>Improved offline file syncing performance.</li>
+                <li>Placeholder may work later </li>
+                <li>Placeholder may work later</li>
+                <li>Placeholder may work later</li>
             </ul>
         </div>
     </section>
@@ -70,7 +70,10 @@
     // total resources
     fetch(`/AdminPanel/Results`)
         .then(res => res.json())
-        .then(async data => {});
+        .then(data=> {
+            document.getElementById('users').innerHTML = data.users;
+            document.getElementById('resources').innerHTML = data.contents;
+        })
 </script>
 </body>
 

@@ -2,8 +2,9 @@ const jwt = require('jsonwebtoken');
 
 const requireLogin = (req, res, next) => {
     const token = req.cookies.session;
-    console.log(token)
-    jwt.verify(token, process.env.SECRET, (err, decodedToken) => console.log("Decoded JWT:", decodedToken));
+    // console.log(token)
+
+    // jwt.verify(token, process.env.SECRET, (err, decodedToken) => console.log("Decoded JWT:", decodedToken));
     // check json web token exists & is verified
     if (token) {
         jwt.verify(token, process.env.SECRET, (err, decodedToken) => {

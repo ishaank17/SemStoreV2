@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#2196f3" >
+    <link rel="manifest" href="/manifest.json">
+    <title>Sem-Store| IITGN</title>
+
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="SemStore" />
+
+
+    <!-- Tailwind CSS CDN -->
+    <link href="/src/Style.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body class="min-h-screen  flex flex-col text-gray-800">
+<script type="module" src="/sync.js"></script>
+<nav class="bg-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center gap-3" >
+            <a href="/"><img src="../images/iitgn-logo.png" alt="IITGN Logo" class="h-10 w-10" ></a>
+            <a href="/"><h1 class="text-xl font-semibold text-blue-600">Sem-Store</h1></a>
+        </div>
+    </div>
+</nav>
+<main class="flex-grow p-6 ">
+
+<!--    <form  action="javascript:void(0)">-->
+<!--        <div class="flex flex-row justify-center gap-4">-->
+<!--            <div class="flex w-full max-w-md sm:flex">-->
+<!--                <input-->
+<!--                        type="text"-->
+<!--                        name="search"-->
+<!--                        id="search"-->
+<!--                        placeholder="Search... MA104"-->
+<!--                        class="pl-3 pr-10 py-2 w-full border border-gray-300 rounded-l-lg bg-gray-50 focus:outline-none focus:border-black text-sm"-->
+<!--                >-->
+<!--                <button-->
+<!--                        type="submit"-->
+<!--                        class="bg-blue-600 text-white p-2 rounded-r-lg hover:bg-blue-700 transition flex items-center justify-center "-->
+<!--                        aria-label="Search"-->
+<!--                ><svg-->
+<!--                            class="w-5 h-5"-->
+<!--                            viewBox="0 0 24 24"-->
+<!--                            fill="none"-->
+<!--                            stroke="currentColor"-->
+<!--                            stroke-width="2"-->
+<!--                            stroke-linecap="round"-->
+<!--                            stroke-linejoin="round"-->
+<!--                    >-->
+<!--                        <path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z"/>-->
+<!--                    </svg>-->
+<!--                </button>-->
+<!--            </div>-->
+
+<!--            <div class="hidden sm:block" >-->
+<!--                <select id="sem" name="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">-->
+<!--                    <option value="" hidden disabled selected>Semester</option>-->
+<!--                    <option value="" >None</option>-->
+<!--                    <option value="sem1">Semester-1</option>-->
+<!--                    <option value="sem2">Semester-2</option>-->
+<!--                </select>-->
+<!--            </div>-->
+
+<!--            <div class="hidden sm:block" >-->
+<!--                <select id="branch" name="branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">-->
+<!--                    <option value="" disabled selected hidden>Select your branch</option>-->
+<!--                    <option value="" >None</option>-->
+<!--                    <option value="CSE">CSE</option>-->
+<!--                    <option value="AI">AI</option>-->
+<!--                    <option value="EE">EE</option>-->
+<!--                    <option value="ICD">ICDT</option>-->
+<!--                    <option value="ME">ME</option>-->
+<!--                    <option value="CH">CH</option>-->
+<!--                    <option value="CE">CE</option>-->
+<!--                    <option value="MSE">MSE</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="hidden sm:block">-->
+<!--                &lt;!&ndash;                apply filter&ndash;&gt;-->
+<!--                &lt;!&ndash;                <button&ndash;&gt;-->
+<!--                &lt;!&ndash;                        type="button"&ndash;&gt;-->
+<!--                &lt;!&ndash;                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"&ndash;&gt;-->
+<!--                &lt;!&ndash;                >&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <svg&ndash;&gt;-->
+<!--                &lt;!&ndash;                            class="w-4 h-4"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            fill="none"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke="currentColor"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke-width="2"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke-linecap="round"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke-linejoin="round"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            viewBox="0 0 24 24"&ndash;&gt;-->
+<!--                &lt;!&ndash;                    >&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.586L3.293 6.707A1 1 0 013 6V4z" />&ndash;&gt;-->
+<!--                &lt;!&ndash;                    </svg>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    Apply Filter&ndash;&gt;-->
+<!--                &lt;!&ndash;                </button>&ndash;&gt;-->
+<!--                <select id="order" name="order" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">-->
+<!--                    <option value="" disabled selected hidden>Popularity</option>-->
+<!--                    <option value="-1">Descending</option>-->
+<!--                    <option value="1">Ascending</option>-->
+<!--                </select>-->
+
+<!--            </div>-->
+<!--            <div class="block sm:hidden" >-->
+
+<!--                <button-->
+<!--                        type="button"-->
+<!--                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"-->
+<!--                        onclick="document.getElementById('mobileFilter').classList.toggle('hidden')"-->
+<!--                >-->
+<!--                    <svg viewBox="0 0 15 15" fill="currentColor" stroke="currentColor"-->
+<!--                         stroke-width="2"   class="w-4 h-4">-->
+<!--                        <path d="M6.666666666666666 12h2.6666666666666665v-1.3333333333333333h-2.6666666666666665v1.3333333333333333ZM2 4v1.3333333333333333h12V4H2Zm2 4.666666666666666h8v-1.3333333333333333H4v1.3333333333333333Z" stroke-width="0.6667"></path>-->
+<!--                    </svg>-->
+<!--                    More Filter-->
+<!--                </button>-->
+
+<!--            </div>-->
+
+<!--        </div>-->
+<!--        <div class="flex flex-col gap-4 p-4 bg-white rounded-2xl shadow-md border border-gray-200 hidden sm:hidden" id="mobileFilter">-->
+<!--            <div class="block" >-->
+<!--                <select id="sem-mobile" name="sem" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">-->
+<!--                    <option value="" hidden disabled selected>Semester</option>-->
+<!--                    <option value="" >None</option>-->
+<!--                    <option value="sem1">Semester-1</option>-->
+<!--                    <option value="sem2">Semester-2</option>-->
+<!--                </select>-->
+<!--            </div>-->
+
+<!--            <div class="block" >-->
+<!--                <select id="branch-mobile" name="branch" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">-->
+<!--                    <option value="" disabled selected hidden>Select your branch</option>-->
+<!--                    <option value="" >None</option>-->
+<!--                    <option value="CSE">CSE</option>-->
+<!--                    <option value="AI">AI</option>-->
+<!--                    <option value="EE">EE</option>-->
+<!--                    <option value="ICD">ICDT</option>-->
+<!--                    <option value="ME">ME</option>-->
+<!--                    <option value="CH">CH</option>-->
+<!--                    <option value="CE">CE</option>-->
+<!--                    <option value="MSE">MSE</option>-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <div class="block" >-->
+<!--                &lt;!&ndash;                <button&ndash;&gt;-->
+<!--                &lt;!&ndash;                        type="button"&ndash;&gt;-->
+<!--                &lt;!&ndash;                        class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition"&ndash;&gt;-->
+<!--                &lt;!&ndash;                >&ndash;&gt;-->
+<!--                &lt;!&ndash;                    <svg&ndash;&gt;-->
+<!--                &lt;!&ndash;                            class="w-4 h-4"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            fill="none"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke="currentColor"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke-width="2"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke-linecap="round"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            stroke-linejoin="round"&ndash;&gt;-->
+<!--                &lt;!&ndash;                            viewBox="0 0 24 24"&ndash;&gt;-->
+<!--                &lt;!&ndash;                    >&ndash;&gt;-->
+<!--                &lt;!&ndash;                        <path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L14 13.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 018 17v-3.586L3.293 6.707A1 1 0 013 6V4z" />&ndash;&gt;-->
+<!--                &lt;!&ndash;                    </svg>&ndash;&gt;-->
+<!--                &lt;!&ndash;                    Apply Filter&ndash;&gt;-->
+<!--                &lt;!&ndash;                </button>&ndash;&gt;-->
+<!--                <select id="order-mobile" name="order" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-black  w-full p-2 focus:outline-none ">-->
+<!--                    <option value="" disabled selected hidden>Popularity</option>-->
+<!--                    <option value="-1">Descending</option>-->
+<!--                    <option value="1">Ascending</option>-->
+<!--                </select>-->
+
+<!--            </div>-->
+<!--        </div>-->
+<!--    </form>-->
+
+    <div class="p-5 h-screen" >
+
+
+        <div class="overflow-auto rounded-lg shadow hidden md:block">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b-2 border-gray-200">
+                <tr>
+
+                    <th class=" p-3 text-sm font-semibold tracking-wide text-left w-max">Title</th>
+                    <th class=" p-3 text-sm font-semibold tracking-wide text-left">Available</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100" id="results">
+
+                </tbody>
+            </table>
+        </div>
+        <div class="grid grid-cols-1 gap-4 md:hidden" id="resultsmobile">
+
+        </div>
+
+    </div>
+</main>
+<script type="module">
+    import {getAll} from "/js/db.js";
+    const resultsContainer = document.getElementById('results'); // Create this div or UL for results
+    const resultsContainer2 = document.getElementById('resultsmobile');
+    const data = await getAll();
+    let rows="";
+    for (const files of data) {
+        console.log(files);
+        rows+=`
+          <tr class="text-gray-700 bg-white hover:bg-gray-200">
+            <td class="p-3 text-sm whitespace-nowrap"><a href="${files.link}">${files.title}</a></td>
+            <td>
+                <img src="images/tick.png" alt="Available offline" style="width:30px;height:30px;">
+            </td>
+          </tr>`
+    }
+    resultsContainer.innerHTML = rows;
+
+</script>
+
+
+
+<footer class="  bg-white py-6 border-t">
+    <div class="text-center text-sm text-gray-600">
+        &copy; 2025 Sem-Store | Made for IIT Gandhinagar
+    </div>
+</footer>
+<script src="/startSW.js"></script>
+
+</body>
+
+</html>
+

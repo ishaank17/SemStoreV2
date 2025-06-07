@@ -10,12 +10,11 @@
         <ul class="flex space-x-4">
             <li><a href="/Home" class="text-blue-600 hover:text-blue-800">Explore</a></li>
             <li><a href="#about" class="text-blue-600 hover:text-blue-800">About</a></li>
-            <li><a href="/AdminPanel" class="text-blue-600 hover:text-blue-800">Admin Panelaaaa</a></li>
             <li><a href="/Downloads" class="text-blue-600 hover:text-blue-800">Downloaded Files</a></li>
+
             <% if (role==="Contributor" || role==="Admin") { %>
                 <li><a href="/Upload" class="text-blue-600 hover:text-blue-800">Upload Page</a></li>
             <% } %>
-
             <% if (role==="Admin") { %>
                 <li><a href="/AdminPanel" class="text-blue-600 hover:text-blue-800">Admin Panel</a></li>
             <% } %>
