@@ -15,7 +15,7 @@ const contentSchema = mongoose.Schema({
     semester: String,
     tags:String,
     path: String,
-    popularity: { type: Number, default: 0 }
+    popularity: { type: Number, default: 0 },
 
 })
 

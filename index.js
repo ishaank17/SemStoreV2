@@ -8,6 +8,7 @@ const jwt=require("jsonwebtoken");
 const cookieParser = require('cookie-parser');
 const userModel=require('./models/user');
 const content=require('./models/Content');
+const report=require('./models/Report');
 const {requireLogin}=require('./models/LoginCheck');
 const {requireAdmin}=require('./models/AdminCheck');
 const multer = require('multer');
@@ -405,7 +406,9 @@ app.get('/AdminPanel/Users', async (req, res) => {
     res.render('ManageUsers.ejs');
 });
 app.get('/AdminPanel/Reports', async (req, res) => {
-    res.render('ManageReports.ejs');
+    const reports =await report.find()
+    console.log({reports});
+    res.render('ManageReports.ejs',{reports});
 });
 
 app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
@@ -442,6 +445,24 @@ app.post('/AdminPanel/Users/:id/delete', async (req, res) => {
     res.redirect('/AdminPanel/Users');
 
 });
+
+
+app.get("/push",  (req, res) => {
+    res.render('push.ejs');
+})
+//d
+const webpush = require('web-push');
+
+webpush.setVapidDetails(
+    'mailto:ishaan.kamath@iitgn.ac.in',
+    process.env.VAPID_PUBLIC_KEY,
+    process.env.VAPID_PRIVATE_KEY
+);
+app.post("/noti",  (req, res) => {
+    const sub= req.body;
+    const payload = JSON.stringify({title:"PUSH TEST"});
+    webpush.sendNotification(sub,payload).catch(e=>console.log(e));
+})
 
 
 
