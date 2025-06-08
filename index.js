@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const userModel=require('./models/user');
 const content=require('./models/Content');
 const report=require('./models/Report');
+const subscribe=require('./models/Subs');
 const {requireLogin}=require('./models/LoginCheck');
 const {requireAdmin}=require('./models/AdminCheck');
 const multer = require('multer');
@@ -170,6 +171,7 @@ app.use((req, res, next) => {
         res.locals.email = decoded.email;
         res.locals.profilePhoto = decoded.profilePhoto;
         res.locals.role = decoded.role;
+        res.locals._id = decoded._id;
         // console.log(decoded.role)
     } catch (err) {
         res.locals.name = null;
@@ -232,23 +234,28 @@ app.get('/Login', async (req, res) => {
 
     // console.log(row)
     if(!(row)) {
-        let session= jwt.sign({rollno:data.family_name,
-            name: data.given_name,
-            email: data.email,
-            profilePhoto: data.picture,
-            role:"Student"},process.env.SECRET);
-        await userModel.create({
+
+        const result =await userModel.create({
             rollno:data.family_name,
             name: data.given_name,
             email: data.email,
             profilePhoto: data.picture,
             role:"Student"
         })
+
+        let session= jwt.sign({rollno:data.family_name,
+            _id:result._id,
+            name: data.given_name,
+            email: data.email,
+            profilePhoto: data.picture,
+            role:"Student"},process.env.SECRET);
+
         res.cookie('session',session);
         res.redirect('/Signup',);
     }
     else{
         let session= jwt.sign({rollno:row.rollno,
+            _id:row._id,
             name: row.name,
             email: row.email,
             profilePhoto: row.profilePhoto,
@@ -458,10 +465,39 @@ webpush.setVapidDetails(
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
 );
-app.post("/noti",  (req, res) => {
-    const sub= req.body;
-    const payload = JSON.stringify({title:"PUSH TEST"});
-    webpush.sendNotification(sub,payload).catch(e=>console.log(e));
+app.get("/AdminPanel/Notify/:msg",  async (req, res) => {
+    const msg= req.params.msg;
+    const subs=await subscribe.find()
+    const payload = JSON.stringify({
+        title: "Sem-Store",
+        body: msg
+    });
+
+    for (const subdata of subs) {
+        const sub=subdata.sub;
+        // console.log(sub)
+        try {
+            const result = await webpush.sendNotification(sub, payload);
+            console.log("sent");
+            res.json(result);
+        } catch (err) {
+            if (err.statusCode === 404 || err.statusCode === 410) {
+                // Remove expired subscription from DB
+                await subscribe.deleteOne({ "sub.endpoint": sub.endpoint });
+                console.log(`Removed expired subscription: ${sub.endpoint}`);
+            } else {
+                console.error(`Failed to send to ${sub.endpoint}`, err);
+            }
+        }
+    }
+})
+app.post("/Subscribe", async (req, res) => {
+    const subData= req.body;
+    const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+    const result = await subscribe.findOne({ id:data._id ,"sub.endpoint": subData.endpoint, });
+    if (!result) {
+        await subscribe.create({ id:data._id ,sub:subData })
+    }
 })
 
 

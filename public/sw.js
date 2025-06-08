@@ -116,37 +116,51 @@ self.addEventListener('fetch', event => {
 //     }
 // }
 
-function subscribeForPush() {
-    navigator.serviceWorker.ready.then(reg => {
-        reg.pushManager.getSubscription().then(sub => {
-            if (!sub) {
-                reg.pushManager.subscribe({
-                    userVisibleOnly: true
-                    // No applicationServerKey needed if your server doesn't enforce VAPID
-                }).then(newSub => {
-                    console.log('🔔 Registration created:', newSub.toJSON());
-
-                    // Send subscription to server via POST
-                    fetch('/noti', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(newSub.toJSON())
-                    });
-                }).catch(err => {
-                    console.error('Push subscription error:', err);
-                });
-            } else {
-                console.log('🔔 Already subscribed:', sub.toJSON());
-            }
-        });
-    });
-}
+// function subscribeForPush() {
+//     navigator.serviceWorker.ready.then(reg => {
+//         reg.pushManager.getSubscription().then(sub => {
+//             if (!sub) {
+//                 reg.pushManager.subscribe({
+//                     userVisibleOnly: true
+//                     // No applicationServerKey needed if your server doesn't enforce VAPID
+//                 }).then(newSub => {
+//                     console.log('🔔 Registration created:', newSub.toJSON());
+//
+//                     // Send subscription to server via POST
+//                     fetch('/noti', {
+//                         method: 'POST',
+//                         headers: {
+//                             'Content-Type': 'application/json'
+//                         },
+//                         body: JSON.stringify(newSub.toJSON())
+//                     });
+//                 }).catch(err => {
+//                     console.error('Push subscription error:', err);
+//                 });
+//             } else {
+//                 console.log('🔔 Already subscribed:', sub.toJSON());
+//             }
+//         });
+//     });
+// }
 
 self.addEventListener('push', (event) => {
-    let title = event.data.text();
+    let data = { title: "Default title", body: "Default message" };
+
+    if (event.data) {
+        try {
+            data = event.data.json();  // parse JSON payload
+        } catch {
+            data.title = event.data.text();  // fallback for plain text
+        }
+    }
+
+    const options = {
+        body: data.body,
+        // You can add icon, badge etc. here too
+    };
+
     event.waitUntil(
-        self.registration.showNotification(title)
-    )
+        self.registration.showNotification(data.title, options)
+    );
 });
