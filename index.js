@@ -230,7 +230,7 @@ app.get('/Login', async (req, res) => {
     let row= await userModel.findOne({rollno:data.family_name})
 
     // console.log(row)
-    if(!row) {
+    if(!(row)) {
         let session= jwt.sign({rollno:data.family_name,
             name: data.given_name,
             email: data.email,
@@ -253,7 +253,8 @@ app.get('/Login', async (req, res) => {
             profilePhoto: row.profilePhoto,
             role:row.role},process.env.SECRET);
         res.cookie('session',session);
-        res.redirect('Home');
+        if(!row.branch)res.redirect('/Signup');
+        else res.redirect('/Home');
     }
 })
 app.post('/Create', async (req, res) => {
@@ -295,6 +296,20 @@ app.get('/Home/search', requireLogin, async (req, res) => {
     // console.log(typeof (order));
     // console.log("Filter:", JSON.stringify(filter, null, 2));
     const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
+    res.json(results);
+});
+
+
+app.get('/AdminPanel/Users/search', requireLogin, async (req, res) => {
+    const { q, role } = req.query;
+
+    let filter = {};
+
+    if (q) {
+        filter.$or=[{ name: { $regex: q, $options: 'i' }} , {role:{ $regex: q, $options: 'i' } }]
+    }
+    if (role) filter.role = role;
+    const results = await userModel.find(filter); //.sort({name: 1}); //.limit(20)
     res.json(results);
 });
 
@@ -384,12 +399,13 @@ app.post('/delete/:filename',requireLogin, async (req, res) => {
 });
 
 app.get('/AdminPanel/Content', async (req, res) => {
-    const users = await content.find(); // can filter role
-    res.render('ManageContent.ejs', { users });
+    res.render('ManageContent.ejs');
 });
 app.get('/AdminPanel/Users', async (req, res) => {
-    const users = await userModel.find(); // can filter role
-    res.render('ManageUsers.ejs', { users });
+    res.render('ManageUsers.ejs');
+});
+app.get('/AdminPanel/Reports', async (req, res) => {
+    res.render('ManageReports.ejs');
 });
 
 app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
@@ -402,6 +418,33 @@ app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
     }
     res.redirect('/AdminPanel/Contents');
 });
+app.post('/AdminPanel/Users/:id/promote', async (req, res) => {
+    const result =await userModel.findOne({ _id: req.params.id });
+    let roles="";
+    if(result.role==='Student')  roles = "Contributor";
+    else if(result.role==='Contributor')  roles = "Admin";
+    else if(result.role==='Admin')  roles = "Owner";
+    await userModel.updateOne({ _id: req.params.id },{role:roles})
+    res.redirect('/AdminPanel/Users');
+
+});
+app.post('/AdminPanel/Users/:id/demote', async (req, res) => {
+    const result =await userModel.findOne({ _id: req.params.id });
+    let roles="";
+    if(result.role==='Contributor')  roles = "Student";
+    else if(result.role==='Admin')  roles = "Contributor";
+    else if(result.role==='Owner')  roles = "Admin";
+    await userModel.updateOne({ _id: req.params.id },{role:roles})
+    res.redirect('/AdminPanel/Users');
+});
+app.post('/AdminPanel/Users/:id/delete', async (req, res) => {
+    const result =await userModel.deleteOne({_id: req.params.id});
+    res.redirect('/AdminPanel/Users');
+
+});
+
+
+
 
 app.listen(80)
 
