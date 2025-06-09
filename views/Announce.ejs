@@ -1,0 +1,94 @@
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <meta name="theme-color" content="#2196f3" >
+    <title>Enter Details - Sem-Store</title>
+    <!-- Tailwind CSS CDN -->
+    <link href="/src/new.css" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" type="image/png" href="/icons/favicon-96x96.png" sizes="96x96" />
+    <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="shortcut icon" href="/icons/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png" />
+    <meta name="apple-mobile-web-app-title" content="SemStore" />
+
+    <!-- Optional: Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+</head>
+
+<body class=" min-h-screen  flex flex-col text-gray-800">
+<%- include("navbar.ejs")%>
+
+<main class="flex-grow container mx-auto px-4 py-8">
+    <form  class="bg-white rounded-2xl shadow-2xl mx-auto max-w-[80vw] space-y-4 p-6">
+        <h2 class="text-center text-xl font-extrabold ">Enter The Details</h2>
+
+        <div class="w-full ">
+            <label for="title" class="block font-semibold mb-1" >Title:</label>
+            <input type="text" id="title" name="title" placeholder="Type Here..." class="block border border-gray-300  w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+        </div>
+
+        <div class="w-full ">
+            <label for="msg" class="block font-semibold mb-1">Message:</label>
+            <textarea  id="msg" name="msg" rows="3" placeholder="Type Here..." class="block border border-gray-300 w-full px-3 py-1 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required></textarea>
+        </div>
+        <button type="submit" onclick="sendNotification()" class="text-white bg-blue-600 hover:bg-blue-700 focus:ring-1 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 " aria-label="Search">
+            Send Notification
+        </button>
+
+    </form>
+</main>
+
+<script>
+    document.querySelector('form').addEventListener('submit', sendNotification);
+    async function sendNotification(event) {
+        event.preventDefault(); // ⛔ prevent form reload
+
+        const title = document.getElementById('title').value;
+        const message = document.getElementById('msg').value;
+        console.log("Sending notification...", title, message);
+        const payload = {
+            title: title,
+            msg: message
+        };
+
+        try {
+            const res = await fetch('/AdminPanel/Notify', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) throw new Error("Failed to send");
+
+            alert("Notification sent successfully!");
+        } catch (err) {
+            alert("Error: " + err.message);
+        }
+    }
+</script>
+
+<%- include("footer.ejs")%>
+
+</body>
+
+</html>
+
+
+
+
+
+

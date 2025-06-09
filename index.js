@@ -454,10 +454,6 @@ app.post('/AdminPanel/Users/:id/delete', async (req, res) => {
 });
 
 
-app.get("/push",  (req, res) => {
-    res.render('push.ejs');
-})
-//d
 const webpush = require('web-push');
 
 webpush.setVapidDetails(
@@ -465,32 +461,36 @@ webpush.setVapidDetails(
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
 );
-app.get("/AdminPanel/Notify/:msg",  async (req, res) => {
-    const msg= req.params.msg;
-    const subs=await subscribe.find()
+app.post("/AdminPanel/Notify/", async (req, res) => {
+    const subs = await subscribe.find();
     const payload = JSON.stringify({
-        title: "Sem-Store",
-        body: msg
+        title: req.body.title,
+        body: req.body.msg
     });
 
+    const results = [];
+
     for (const subdata of subs) {
-        const sub=subdata.sub;
-        // console.log(sub)
+        const sub = subdata.sub;
         try {
             const result = await webpush.sendNotification(sub, payload);
             console.log("sent");
-            res.json(result);
+            results.push({ endpoint: sub.endpoint, success: true });
         } catch (err) {
             if (err.statusCode === 404 || err.statusCode === 410) {
                 // Remove expired subscription from DB
                 await subscribe.deleteOne({ "sub.endpoint": sub.endpoint });
                 console.log(`Removed expired subscription: ${sub.endpoint}`);
+                results.push({ endpoint: sub.endpoint, success: false, removed: true });
             } else {
                 console.error(`Failed to send to ${sub.endpoint}`, err);
+                results.push({ endpoint: sub.endpoint, success: false, error: err.message });
             }
         }
     }
-})
+
+    res.json({ results });
+});
 app.post("/Subscribe", async (req, res) => {
     const subData= req.body;
     const data = await jwt.verify(req.cookies.session, process.env.SECRET);
@@ -499,9 +499,10 @@ app.post("/Subscribe", async (req, res) => {
         await subscribe.create({ id:data._id ,sub:subData })
     }
 })
+app.get("/AdminPanel/Announce",  (req, res) => {
+    res.render('Announce.ejs');
+})
 
+app.listen(80,() => console.log(`Server running on port 80`));
 
-
-
-app.listen(80)
 

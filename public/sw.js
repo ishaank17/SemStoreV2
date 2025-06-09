@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'sem-store-v10';
+const CACHE_NAME = 'sem-store-v18';
 const urlsToCache = [
     '/manifest.json',
     '/startSW.js',
@@ -32,17 +32,21 @@ self.addEventListener('install', (event) => {
                 console.error('Failed to cache during install:', err);
             })
     );
+
 });
 
 self.addEventListener('activate', (event) => {
     // console.log("Activated");
    event.waitUntil(
 
-       caches.keys().then(keys => {
-            return Promise.all(keys
-                    .filter(key => key !== CACHE_NAME && key !== 'offline-files')
-                    .map(key => caches.delete(key)))
-       })
+           caches.keys().then(keys => {
+               return Promise.all(
+                   keys
+                       .filter(key => key !== CACHE_NAME && key !== 'offline-files')
+                       .map(key => caches.delete(key))
+               );
+           })
+
    )
 });
 
@@ -101,6 +105,7 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
 // if ('serviceWorker' in navigator && 'PushManager' in window) {
 //     console.log("here")
 //     if (Notification.permission !== 'granted') {

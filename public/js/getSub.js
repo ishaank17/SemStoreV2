@@ -41,3 +41,5 @@ function subscribeForPush() {
         });
     });
 }
+
+
