@@ -9,8 +9,11 @@
 <!--                <path d="M4 6h16M4 12h16M4 18h16" />-->
 <!--            </svg>                    -->
 <!--        </button>-->
-        <img src="<%= profilePhoto || '/images/hamburger.png' %>" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" alt="Profile" class="h-10 w-10 rounded-full border-2 border-blue-500 cursor-pointer sm:hidden"/>
-
+        <% if (name) { %>
+            <img src="<%= typeof profilePhoto !== 'undefined' ? profilePhoto : '/images/hamburger.png' %>" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" alt="Profile" class="h-10 w-10 rounded-full border-2 border-blue-500 cursor-pointer sm:hidden"/>
+        <%}else{%>
+            <img src="<%= typeof profilePhoto !== 'undefined' ? profilePhoto : '/images/hamburger.png' %>" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" alt="Profile" class="h-10 w-10 rounded-full   cursor-pointer sm:hidden"/>
+        <%}%>
 
         <!-- Logo & Brand -->
         <div class="flex items-center gap-3">
