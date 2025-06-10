@@ -1,15 +1,29 @@
 
-
 <script type="module" src="/sync.js"></script>
-<nav class="bg-white shadow-md sticky top-0 z-100">
+<nav class="bg-white shadow-md sticky top-0 z-[100]">
     <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-        <div class="flex items-center gap-3" >
-            <a href="/"><img src="../images/iitgn-logo.png" alt="IITGN Logo" class="h-10 w-10" ></a>
+        <!-- Mobile Toggle Button -->
+<!--        <button class="sm:hidden text-blue-600 focus:outline-none" >-->
+<!--            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"-->
+<!--                 stroke-linecap="round" stroke-linejoin="round">-->
+<!--                <path d="M4 6h16M4 12h16M4 18h16" />-->
+<!--            </svg>                    -->
+<!--        </button>-->
+        <img src="<%= profilePhoto || '/images/hamburger.png' %>" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" alt="Profile" class="h-10 w-10 rounded-full border-2 border-blue-500 cursor-pointer sm:hidden"/>
+
+
+        <!-- Logo & Brand -->
+        <div class="flex items-center gap-3">
+            <a href="/"><img src="/images/iitgn-logo.png" alt="IITGN Logo" class="h-10 w-10"></a>
             <a href="/"><h1 class="text-xl font-semibold text-blue-600">Sem-Store</h1></a>
         </div>
-        <ul class="flex space-x-4">
+
+
+
+        <!-- Desktop Nav -->
+        <ul class="hidden sm:flex space-x-4 items-center">
             <li><a href="/Home" class="text-blue-600 hover:text-blue-800">Explore</a></li>
-            <li><a href="#about" class="text-blue-600 hover:text-blue-800">About</a></li>
+            <li><a href="/" class="text-blue-600 hover:text-blue-800">About</a></li>
             <li><a href="/Downloads" class="text-blue-600 hover:text-blue-800">Downloaded Files</a></li>
 
             <% if (role==="Contributor" || role==="Admin" || role==="Owner") { %>
@@ -19,14 +33,56 @@
                 <li><a href="/AdminPanel" class="text-blue-600 hover:text-blue-800">Admin Panel</a></li>
             <% } %>
 
-            <% if (!name) { %>
-                <li><a href="<%=link %>" class="text-blue-600 hover:text-blue-800 login">Login</a></li>
+            <% if (name) { %>
+                <li class="relative group">
+                    <img src="<%= profilePhoto || '/images/hamburger.png' %>" alt="Profile" id="profileToggle"
+                         class="h-10 w-10 rounded-full border-2 border-blue-500 cursor-pointer"/>
+
+                    <!-- Dropdown -->
+                    <div id="profileMenu"
+                         class="absolute right-0 mt-2 w-40 bg-white border rounded-lg shadow-lg py-2 hidden z-50">
+                        <a href="/Signup" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Edit Profile</a>
+                        <a href="/Logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</a>
+                    </div>
+                </li>
             <% } else { %>
-                <li><a href="/Logout" class="text-blue-600 hover:text-blue-800 logout">Logout</a></li>
+                <li><a href="<%= link %>" class="text-blue-600 hover:text-blue-800 login">Login</a></li>
+            <% } %>
+            </ul>
+    </div>
+    <script>
+        const profileToggle = document.getElementById('profileToggle');
+        const profileMenu = document.getElementById('profileMenu');
+
+        profileToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu.classList.toggle('hidden');
+        });
+
+        // Hide menu when clicking outside
+        window.addEventListener('click', () => {
+            profileMenu?.classList.add('hidden');
+        });
+    </script>
+    <!-- Mobile Menu -->
+    <div id="mobileMenu" class="sm:hidden px-4 pb-3 w-full hidden z-77 fixed bg-white ">
+        <ul class="space-y-2 text-left">
+            <li><a href="/Home" class="block text-blue-600 hover:text-blue-800">Explore</a></li>
+            <li><a href="/" class="block text-blue-600 hover:text-blue-800">About</a></li>
+            <li><a href="/Downloads" class="block text-blue-600 hover:text-blue-800">Downloaded Files</a></li>
+
+            <% if (role==="Contributor" || role==="Admin" || role==="Owner") { %>
+                <li><a href="/Upload" class="block text-blue-600 hover:text-blue-800">Upload Page</a></li>
+            <% } %>
+            <% if (role==="Admin" || role==="Owner") { %>
+                <li><a href="/AdminPanel" class="block text-blue-600 hover:text-blue-800">Admin Panel</a></li>
             <% } %>
 
-
-
+            <% if (!name) { %>
+            <li><a href="<%=link %>" class="block text-blue-600 hover:text-blue-800 login">Login</a></li>
+            <% } else { %>
+                <li><a href="/Logout" class="block text-blue-600 hover:text-blue-800 logout">Logout</a></li>
+            <% } %>
         </ul>
     </div>
 </nav>

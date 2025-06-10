@@ -38,6 +38,7 @@
         <div class="flex flex-row justify-center gap-4">
             <div class="flex w-full max-w-md sm:flex">
                 <input
+                        value="<%=searchid%>"
                         type="text"
                         name="search"
                         id="search"
@@ -244,7 +245,7 @@
 
 
 
-            fetch(`/Home/Search?${params}`)
+            fetch(`/AdminPanel/Search?${params}`)
                 .then(res => res.json())
                 .then(async data => {
                     const rows = await Promise.all(data.map(async resource => {

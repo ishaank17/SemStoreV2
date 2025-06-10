@@ -5,14 +5,16 @@ const mongoose = require('mongoose');
 mongoose.connect(`${MONGO_URL}`,{dbName: `${DB_NAME}`})
 const userSchema = mongoose.Schema({
     by:String, //id
+    resourceID:String,
     resourceTitle: String, //code and title
     reportedByEmail:String, //email
     reason: String, //rsn - innap outdated others
     description: String, // desc
     status:String,  //"Pending", or "Resolved"
     createdAt: String , //new Date().toLocaleDateString()
-    reply: String,
-    replyBy: String, //id of replier
+    reply: {type:String,default:''},
+    replyBy: {type:String,default:''},
+    repliedAt:{type:String,default:''}//id of replier
     // true def, on reply change to false and then display notif and put in list then
 })
 

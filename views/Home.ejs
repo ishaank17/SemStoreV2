@@ -20,7 +20,8 @@
 <!--        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>-->
     <!-- Optional: Google Font -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-
+<!--    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">&lt;!&ndash;!Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2025 Fonticons, Inc.&ndash;&gt;<path d="M119.4 44.1c23.3-3.9 46.8-1.9 68.6 5.3l49.8 77.5-75.4 75.4c-1.5 1.5-2.4 3.6-2.3 5.8s1 4.2 2.6 5.7l112 104c2.9 2.7 7.4 2.9 10.5 .3s3.8-7 1.7-10.4l-60.4-98.1 90.7-75.6c2.6-2.1 3.5-5.7 2.4-8.8L296.8 61.8c28.5-16.7 62.4-23.2 95.7-17.6C461.5 55.6 512 115.2 512 185.1l0 5.8c0 41.5-17.2 81.2-47.6 109.5L283.7 469.1c-7.5 7-17.4 10.9-27.7 10.9s-20.2-3.9-27.7-10.9L47.6 300.4C17.2 272.1 0 232.4 0 190.9l0-5.8c0-69.9 50.5-129.5 119.4-141z"/></svg>-->
+<!--dislike-->
 </head>
 
 <body class="min-h-screen  flex flex-col text-gray-800">
@@ -194,29 +195,10 @@
                     <th class="w-24 p-3 text-sm font-semibold tracking-wide text-left">Uploaded By</th>
                     <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Time</th>
                     <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Available Offline</th>
+                    <th class="w-32 p-3 text-sm font-semibold tracking-wide text-left">Actions</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100" id="results">
-
-
-<!--                <tr class="bg-white hover:bg-gray-200 text-gray-700 " >-->
-
-<!--                    <td class="p-3 text-sm  whitespace-nowrap font-medium"  >ES116</td>-->
-<!--                    <td class="p-3 text-sm  whitespace-nowrap" ><a href="#">Cedra and Smith</a></td>-->
-<!--                    <td class="p-3 text-sm  whitespace-nowrap" >Book For First year chapters</td>-->
-<!--                    <td class="p-3 text-sm  whitespace-nowrap" >PDF</td>-->
-<!--                    <td class="p-3 text-sm  whitespace-nowrap" >Ishaan Kamath</td>-->
-<!--                    <td class="p-3 text-sm  whitespace-nowrap" >May 28</td>-->
-
-<!--                    <td>-->
-<!--                        <div class="flex flex-row gap-6">-->
-<!--                            <button type="button" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg></button>-->
-<!--                            <img src="images/tick.png" alt="is available offline">-->
-<!--                        </div>-->
-
-<!--                    </td>-->
-<!--                </tr>-->
-
 
                 </tbody>
             </table>
@@ -225,28 +207,6 @@
 
         <div class="grid grid-cols-1 gap-4 md:hidden" id="resultsmobile">
 
-
-<!--            <div class="bg-white hover:bg-gray-200 p-3 rounded-lg shadow space-y-2 text-sm">-->
-<!--                <div class="flex items-center justify-between">-->
-<!--                    <a href="#">-->
-<!--                        <div class="flex flex-row space-x-2 ">-->
-<!--                            <span class="font-semibold text-gray-800">ES116</span>-->
-<!--                            <span class="text-gray-600 text-xs">Cedra and Smith</span>-->
-<!--                        </div>-->
-<!--                    </a>-->
-<!--                    <button type="button" class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><img src="images/makeOffline.png" style="width:15px;height:15px;">-->
-<!--                        Available Offline-->
-<!--                    </button>-->
-<!--                </div>-->
-<!--                <a href="#">-->
-<!--                    <p class="text-gray-700 text-sm">Book for First Year Chapters</p>-->
-<!--                    <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">-->
-<!--                        <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">PDF</span>-->
-<!--                        <span>By: Ishaan Kamath</span>-->
-<!--                        <span>28 May</span>-->
-<!--                    </div>-->
-<!--                </a>-->
-<!--            </div>-->
         </div>
 
     </div>
@@ -255,11 +215,15 @@
 
 
 <script type="module">
-    import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
+
     import { findFile } from '/js/db.js';
     import { saveFile } from '/js/db.js';
+    import { followCode } from '/js/follow.js';
+    import { findFollow } from '/js/follow.js';
+    import { unfollowCode } from '/js/follow.js';
+    import {dbPromise} from '/js/db.js';
     async function syncIDBWithCache() {
-        const db = await openDB('test-db', 5);
+        const db = await dbPromise ;
 
         const allFiles = await db.getAll('fileData');
         const cache = await caches.open('offline-files');
@@ -319,7 +283,7 @@
             branch,
             order
         });
-        console.log(params)
+        console.log("fetching" ,params)
 
 
 
@@ -327,12 +291,14 @@
         fetch(`/Home/Search?${params}`)
             .then(res => res.json())
             .then(async data => {
+                console.log("Data received:", data);
+                console.log("Data length:", data.length);
                 // Map to an array of promises resolving to strings
                 const rows = await Promise.all(data.map(async resource => {
                     const exists = await findFile(resource._id);
-                    console.log(exists);
+                    const isLiked = await findFollow(resource.coursecode);
+                    console.log("Rendering:", resource.coursecode, "isLiked:", isLiked);
                     if (exists) {
-                        // offline version
                         return `
           <tr class="text-gray-700 bg-white hover:bg-gray-200">
             <td class="p-3 text-sm whitespace-nowrap font-medium">${resource.coursecode}</td>
@@ -349,7 +315,31 @@
                 <img src="/images/tick.png" alt="Available offline" style="width:30px;height:30px;">
               </div>
             </td>
-          </tr>`;
+               <td class="p-3 text-sm whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                        ${isLiked
+                            ? `<button onclick="deleteFollow('${resource.coursecode}')" title="Un-Follow Course" class="text-pink-600 hover:text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" fill="currentColor"><path d="M119.4 44.1c23.3-3.9 46.8-1.9 68.6 5.3l49.8 77.5-75.4 75.4c-1.5 1.5-2.4 3.6-2.3 5.8s1 4.2 2.6 5.7l112 104c2.9 2.7 7.4 2.9 10.5 .3s3.8-7 1.7-10.4l-60.4-98.1 90.7-75.6c2.6-2.1 3.5-5.7 2.4-8.8L296.8 61.8c28.5-16.7 62.4-23.2 95.7-17.6C461.5 55.6 512 115.2 512 185.1l0 5.8c0 41.5-17.2 81.2-47.6 109.5L283.7 469.1c-7.5 7-17.4 10.9-27.7 10.9s-20.2-3.9-27.7-10.9L47.6 300.4C17.2 272.1 0 232.4 0 190.9l0-5.8c0-69.9 50.5-129.5 119.4-141z"/></svg>
+                                </button>`
+                            : `<button onclick="handleFollow('${resource.coursecode}')" title="Follow Course" class=" hover:text-pink-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="currentColor">
+                                        <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+                                    </svg>
+                                </button>`
+                        }
+
+                      <!-- Report Button -->
+                      <button onclick="reportResource('${resource._id}')"
+                              class="text-red-500 hover:text-red-600"
+                              title="Report Resource">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 512 512">
+                          <path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
+                        </svg>
+                      </button>
+
+                    </div>
+                  </td>
+                </tr>`;
                     } else {
                         // not offline version
                         return `
@@ -368,6 +358,26 @@
                 <img src="/images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
               </div>
             </td>
+            <td class="p-3 text-sm whitespace-nowrap">
+                <div class="flex items-center gap-3">
+                    ${isLiked
+                        ? `<button onclick="deleteFollow('${resource.coursecode}')" title="Un-Follow Course" class="text-pink-600 hover:text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" fill="currentColor"><path d="M119.4 44.1c23.3-3.9 46.8-1.9 68.6 5.3l49.8 77.5-75.4 75.4c-1.5 1.5-2.4 3.6-2.3 5.8s1 4.2 2.6 5.7l112 104c2.9 2.7 7.4 2.9 10.5 .3s3.8-7 1.7-10.4l-60.4-98.1 90.7-75.6c2.6-2.1 3.5-5.7 2.4-8.8L296.8 61.8c28.5-16.7 62.4-23.2 95.7-17.6C461.5 55.6 512 115.2 512 185.1l0 5.8c0 41.5-17.2 81.2-47.6 109.5L283.7 469.1c-7.5 7-17.4 10.9-27.7 10.9s-20.2-3.9-27.7-10.9L47.6 300.4C17.2 272.1 0 232.4 0 190.9l0-5.8c0-69.9 50.5-129.5 119.4-141z"/></svg>
+                            </button>`
+                        : `<button onclick="handleFollow('${resource.coursecode}')" title="Follow Course" class=" hover:text-pink-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="currentColor">
+                                    <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+                                </svg>
+                            </button>`
+                    }
+
+                  <!-- Report Button -->
+                  <button onclick="reportResource('${resource._id}')" class="text-red-500 hover:text-red-600" title="Report Resource">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
+                  </button>
+
+                </div>
+            </td>
           </tr>`;
                     }
                 }));
@@ -375,6 +385,7 @@
                 resultsContainer.innerHTML = rows.join('');
                 const rows2 = await Promise.all(data.map(async resource => {
                     const exists = await findFile(resource._id);
+                    const isLiked = await findFollow(resource.coursecode);
                     console.log(exists);
                     if (exists) {
                                     //offline
@@ -384,14 +395,31 @@
                             <a href="${resource.path}">
                                 <div class="flex flex-row space-x-2 ">
                                     <span class="font-semibold text-gray-800">${resource.coursecode}</span>
-                                    <span class="text-gray-600 text-xs">${resource.title}</span>
+<!--                                    <span class="text-gray-600 text-xs">${resource.title}</span>-->
                                 </div>
                             </a>
+                            <div class="flex gap-2">
+                                ${isLiked
+                                        ? `<button onclick="deleteFollow('${resource.coursecode}')" title="Un-Follow Course" class="text-pink-600 hover:text-gray-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" fill="currentColor"><path d="M119.4 44.1c23.3-3.9 46.8-1.9 68.6 5.3l49.8 77.5-75.4 75.4c-1.5 1.5-2.4 3.6-2.3 5.8s1 4.2 2.6 5.7l112 104c2.9 2.7 7.4 2.9 10.5 .3s3.8-7 1.7-10.4l-60.4-98.1 90.7-75.6c2.6-2.1 3.5-5.7 2.4-8.8L296.8 61.8c28.5-16.7 62.4-23.2 95.7-17.6C461.5 55.6 512 115.2 512 185.1l0 5.8c0 41.5-17.2 81.2-47.6 109.5L283.7 469.1c-7.5 7-17.4 10.9-27.7 10.9s-20.2-3.9-27.7-10.9L47.6 300.4C17.2 272.1 0 232.4 0 190.9l0-5.8c0-69.9 50.5-129.5 119.4-141z"/></svg>
+                            </button>`
+                                        : `<button onclick="handleFollow('${resource.coursecode}')" title="Follow Course" class=" hover:text-pink-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="currentColor">
+                                    <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+                                </svg>
+                            </button>`
+                                    }
+                            <button onclick="reportResource('${resource._id}')" class="text-red-500 hover:text-red-600" title="Report Resource">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
+                              </button>
+
                             <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
-                                 Available Offline
+                                Downloaded
                             </button>
+                            </div>
                         </div>
                         <a href="${resource.path}">
+                            <span class="text-black text-md">${resource.title}</span>
                             <p class="text-gray-700 text-sm">${resource.description}</p>
                             <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
                                 <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">${resource.type}</span>
@@ -409,14 +437,30 @@
                             <a href="${resource.path}">
                                 <div class="flex flex-row space-x-2 ">
                                     <span class="font-semibold text-gray-800">${resource.coursecode}</span>
-                                    <span class="text-gray-600 text-xs">${resource.title}</span>
+<!--                                    <span class="text-gray-600 text-xs">${resource.title}</span>-->
                                 </div>
                             </a>
-                            <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
-                                Make Available Offline
-                            </button>
+                            <div class="flex gap-2">
+                                    ${isLiked
+                                            ? `<button onclick="deleteFollow('${resource.coursecode}')" title="Un-Follow Course" class="text-pink-600 hover:text-gray-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 512 512" fill="currentColor"><path d="M119.4 44.1c23.3-3.9 46.8-1.9 68.6 5.3l49.8 77.5-75.4 75.4c-1.5 1.5-2.4 3.6-2.3 5.8s1 4.2 2.6 5.7l112 104c2.9 2.7 7.4 2.9 10.5 .3s3.8-7 1.7-10.4l-60.4-98.1 90.7-75.6c2.6-2.1 3.5-5.7 2.4-8.8L296.8 61.8c28.5-16.7 62.4-23.2 95.7-17.6C461.5 55.6 512 115.2 512 185.1l0 5.8c0 41.5-17.2 81.2-47.6 109.5L283.7 469.1c-7.5 7-17.4 10.9-27.7 10.9s-20.2-3.9-27.7-10.9L47.6 300.4C17.2 272.1 0 232.4 0 190.9l0-5.8c0-69.9 50.5-129.5 119.4-141z"/></svg>
+                                </button>`
+                                            : `<button onclick="handleFollow('${resource.coursecode}')" title="Follow Course" class=" hover:text-pink-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="24" height="24" fill="currentColor">
+                                        <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+                                    </svg>
+                                </button>`
+                                        }
+                                  <button onclick="reportResource('${resource._id}')" class="text-red-500 hover:text-red-600" title="Report Resource">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
+                                  </button>
+                                <button type="button" onclick="dwload(); cachefile(extractDriveId('${resource.path}'),'${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                                    Offline
+                                </button>
+                            </div>
                         </div>
                         <a href="${resource.path}">
+                            <span class="text-black text-md">${resource.title}</span>
                             <p class="text-gray-700 text-sm">${resource.description}</p>
                             <div class="flex flex-wrap items-center gap-2 text-xs text-gray-600">
                                 <span class="px-2 py-0.5 bg-gray-300 text-gray-800 rounded-full text-[11px] font-medium">${resource.type}</span>
@@ -453,13 +497,21 @@
         // console.log("feth")
         fetchResults();     // trigger fetch manually if user presses Enter or clicks button
     });
+
+
+
+
+
+
     function showLoader() {
         document.getElementById('loader').classList.remove('hidden');
     }
+    window.showLoader = showLoader;
 
     function hideLoader() {
         document.getElementById('loader').classList.add('hidden');
     }
+    window.hideLoader = hideLoader;
     async function cachefile(fileId,fileTitle,btn,ID) {
         try {
             showLoader();
@@ -498,6 +550,34 @@
         }
     }
     window.cachefile = cachefile;
+    async function handleFollow(code){
+    //update local db and incresee popularity of the respective coursecode
+        await followCode(code);
+        await fetch('/followCourse', {
+            method: 'POST',
+            body: JSON.stringify({ coursecode: code }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+        }).then(response => {window.location.reload();});
+    }
+    window.handleFollow = handleFollow;
+
+        //update local db and incresee popularity of the respective coursecode
+        async function deleteFollow(code) {
+            await unfollowCode(code); // local
+            await fetch('/unfollowCourse', {
+                method: 'POST',
+                body: JSON.stringify({ coursecode: code }),
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                credentials: 'include'
+            }).then(response => {window.location.reload();});
+        }
+
+    window.deleteFollow = deleteFollow;
 
 
     function extractDriveId(url) {
@@ -515,6 +595,68 @@
         return null; // No ID found
     }
     window.extractDriveId = extractDriveId;
+    }
+</script>
+<script>
+
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+        console.log("here");
+
+        if (Notification.permission !== 'granted') {
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    subscribeForPush();
+                } else {
+                    console.warn('Push notifications permission denied');
+                }
+            });
+        } else {
+            subscribeForPush();
+        }
+    }
+    function urlBase64ToUint8Array(base64String) {
+        const padding = '='.repeat((4 - base64String.length % 4) % 4);
+        const base64 = (base64String + padding)
+            .replace(/-/g, '+')
+            .replace(/_/g, '/');
+
+        const rawData = atob(base64);
+        return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+    }
+
+    function subscribeForPush() {
+        console.log("Starting to log");
+        const vapidPublicKey = 'BHehFUGEHDZdnusscRlrBCKomV2GsjRaLGa3-ZJjUBtUVv4RDFLGex_T9V33QGi5Vfv1O6WHnsgJ-u9cclk0wD4'; // ← this is hardcoded or injected
+        showLoader(); // Start loader early
+
+        navigator.serviceWorker.ready
+            .then(reg => reg.pushManager.getSubscription().then(existingSubscription => {
+                if (existingSubscription) {
+                    console.log("Already subscribed");
+                     // Ensure loader is hidden
+                    return;
+                }
+
+                return reg.pushManager.subscribe({
+                    userVisibleOnly: true,
+                    applicationServerKey: urlBase64ToUint8Array(vapidPublicKey)
+                }).then(subscription => {
+                    return fetch("/Subscribe", {
+                        method: "POST",
+                        body: JSON.stringify(subscription),
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        credentials: 'include'
+                    });
+                }).finally(() => {
+                    hideLoader();
+                });
+            }))
+            .catch(err => {
+                console.error("Error during push subscription:", err);
+                hideLoader(); // Ensure fallback hide on any error
+            });
     }
 </script>
 <%- include("footer.ejs")%>

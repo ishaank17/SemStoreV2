@@ -1,17 +1,18 @@
-<section class="fixed bottom-18 right-4 z-75 w-full max-w-sm">
-    <div id="notificationPanel" class="hidden bg-white border-l-4 border-blue-500 p-4 shadow-lg rounded-lg animate-slide-in">
-        <div class="flex justify-between items-start gap-2">
-            <div>
-                <p class="font-semibold text-blue-700">New Notification</p>
-                <p class="text-sm text-gray-700 mt-1" id="notificationMessage">
-                    Welcome to Sem-Store! Start exploring now.
-                </p>
-            </div>
-            <button onclick="closeNotification()" class="text-gray-400 hover:text-gray-600">&times;</button>
-        </div>
-    </div>
-</section>
+<!--<section class="fixed bottom-18 right-4 z-75 w-full max-w-sm">-->
+<!--    <div id="notificationPanel" class="hidden bg-white border-l-4 border-blue-500 p-4 shadow-lg rounded-lg animate-slide-in">-->
+<!--        <div class="flex justify-between items-start gap-2">-->
+<!--            <div>-->
+<!--                <p class="font-semibold text-blue-700">New Notification</p>-->
+<!--                <p class="text-sm text-gray-700 mt-1" id="notificationMessage">-->
+<!--                    Welcome to Sem-Store! Start exploring now.-->
+<!--                </p>-->
+<!--            </div>-->
+<!--            <button onclick="closeNotification()" class="text-gray-400 hover:text-gray-600">&times;</button>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--</section>-->
 <!-- Fixed Notification Panel -->
+
 <aside class="hidden fixed top-24 right-4 w-80 bg-white border border-blue-200 rounded-xl shadow-xl z-75">
     <div class="p-4 flex items-center justify-between border-b">
         <h2 class="text-lg font-semibold text-blue-700">Notifications</h2>
@@ -31,22 +32,22 @@
         const panel = document.querySelector("aside");
         panel.classList.toggle("hidden");
     }
-    function showNotification(message) {
-        const panel = document.getElementById('notificationPanel');
-        const msg = document.getElementById('notificationMessage');
-        msg.textContent = message;
-        panel.classList.remove('hidden');
-        setTimeout(() => {
-            panel.classList.add('hidden');
-        }, 5000);
-    }
-    function closeNotification() {
-        document.getElementById('notificationPanel').classList.add('hidden');
-    }
-    // Example trigger
-    window.addEventListener('load', () => {
-        showNotification("You're viewing the latest resources!");
-    });
+    // function showNotification(message) {
+    //     const panel = document.getElementById('notificationPanel');
+    //     const msg = document.getElementById('notificationMessage');
+    //     msg.textContent = message;
+    //     panel.classList.remove('hidden');
+    //     setTimeout(() => {
+    //         panel.classList.add('hidden');
+    //     }, 5000);
+    // }
+    // function closeNotification() {
+    //     document.getElementById('notificationPanel').classList.add('hidden');
+    // }
+// Example trigger
+    // window.addEventListener('load', () => {
+    //     showNotification("You're viewing the latest resources!");
+    // });
 
     function addNotification(msg) {
         const list = document.getElementById('notificationList');
@@ -67,15 +68,15 @@
         },2000);
     });
 </script>
-<style>
-    @keyframes slide-in {
-        0% { opacity: 0; transform: translateX(350px); }
-        100% { opacity: 1; transform: translateX(0); }
-    }
-    .animate-slide-in {
-        animation: slide-in 0.4s ease-out;
-    }
-</style>
+<!--<style>-->
+<!--    @keyframes slide-in {-->
+<!--        0% { opacity: 0; transform: translateX(350px); }-->
+<!--        100% { opacity: 1; transform: translateX(0); }-->
+<!--    }-->
+<!--    .animate-slide-in {-->
+<!--        animation: slide-in 0.4s ease-out;-->
+<!--    }-->
+<!--</style>-->
 
 <footer class="  bg-white py-6 border-t">
     <div class="text-center text-sm text-gray-600">

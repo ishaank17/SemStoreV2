@@ -29,7 +29,11 @@
         <p class="text-sm text-gray-600"><%=error%></p>
     </div>
     <div class="text-center">
+        <% if(error==="Login First"){%>
+            <a href="/" class="text-blue-600 hover:underline">Go back</a>
+        <%}else {%>
         <a href="javascript:history.back()" class="text-blue-600 hover:underline">Go back</a>
+        <%}%>
     </div>
 </div>
 <script src="/startSW.js"></script>

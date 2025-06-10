@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'sem-store-v18';
+const CACHE_NAME = 'sem-store-v22';
 const urlsToCache = [
     '/manifest.json',
     '/startSW.js',
@@ -27,7 +27,7 @@ self.addEventListener('install', (event) => {
             .then(async cache => {
                 await cache.addAll(urlsToCache)
                 console.log('Cached all ');
-            })
+            }).then(()=>self.skipWaiting())
             .catch(err => {
                 console.error('Failed to cache during install:', err);
             })
@@ -45,8 +45,7 @@ self.addEventListener('activate', (event) => {
                        .filter(key => key !== CACHE_NAME && key !== 'offline-files')
                        .map(key => caches.delete(key))
                );
-           })
-
+           }).then(()=>self.clients.claim())
    )
 });
 

@@ -14,53 +14,101 @@
 <body class="bg-[#eaf4f4] font-[Poppins] min-h-screen text-gray-800 flex flex-col">
 <%- include('navbar.ejs') %>
 
-<main class="flex-grow p-6  mx-auto">
+<main class="flex-grow p-6 min-w-[90vw] mx-auto">
     <h1 class="text-3xl font-bold text-blue-700 text-center mb-8">Manage Reports & Feedback</h1>
+    <form action="javascript:void(0)" class="mb-6" id="forms">
+        <label for="status" class="font-semibold text-sm mr-2">Filter by Status:</label>
+        <select name="status" id="status" class="border border-gray-300 rounded-md px-2 py-1 text-sm" >
+            <option value="Pending" >Pending</option>
+            <option value="Resolved" >Resolved</option>
+            <option value="" >All</option>
+        </select>
+    </form>
 
-    <% if (reports.length === 0) { %>
-        <p class="text-center text-gray-600">No reports to show 🎉</p>
-    <% } else { %>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <% reports.forEach(report => { %>
-                <div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" id="results">
+
+        </div>
+
+</main>
+<script>
+
+    const stausSelect = document.getElementById('status');
+    const resultsContainer = document.getElementById('results');
+
+    let debounceTimeout;
+
+    function fetchResults() {
+        const form = document.getElementById('forms');
+        const formData = new FormData(form);
+
+        const status = formData.get('status');
+        const params = new URLSearchParams({
+            st: status
+        });
+
+        fetch(`/AdminPanel/GetReports?${params}`)
+            .then(res => res.json())
+            .then(async data => {
+                let html = "";
+                if (data.length !== 0) {
+                    data.forEach(report => {
+                        if(report.status!=='Resolved') {
+                            html+=`<div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
                     <!-- Header -->
                     <div class="mb-3 space-y-1">
-                        <h2 class="text-lg font-semibold text-gray-800">📁 Resource: <%= report.resourceTitle %></h2>
-                        <p class="text-sm text-gray-600">By: <span class="text-blue-600 font-medium"><%= report.reportedByEmail %></span></p>
-                        <p class="text-sm text-gray-600">Reason: <span class="text-red-600 font-medium"><%= report.reason %></span></p>
+                        <h2 class="text-lg font-semibold text-gray-800">📁 Resource: ${report.resourceTitle}</h2>
+                        <p class="text-sm text-gray-600">By: <span class="text-blue-600 font-medium">${report.reportedByEmail}</span></p>
+                        <p class="text-sm text-gray-600">Reason: <span class="text-red-600 font-medium">${report.reason}</span></p>
                     </div>
 
                     <!-- Meta Info -->
                     <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
-                        <%if(report.status==='Pending'){%><span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">Pending</span><%}%>
-                        <%if(report.status==='Resolved'){%><span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">Resolved</span><%}%>
-                        <span><%= report.createdAt.toLocaleString() %></span>
+                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
+                        <span>${report.createdAt.toLocaleString()}</span>
                     </div>
 
                     <!-- Description -->
-                    <p class="text-sm text-gray-700 mb-4 flex-1"><%= report.description %></p>
+                    <p class="text-sm text-gray-700 mb-4 flex-1">${report.description}</p>
 
                     <!-- Admin Reply Form -->
-                    <% if (report.status !== 'Resolved') { %>
-                        <form action="/AdminPanel/Reports/<%= report._id %>/reply" method="POST" class="space-y-3">
+                        <form action="/AdminPanel/Reports/${report._id}/reply/${report.by}" method="POST" class="space-y-3">
                             <div>
-                                <label for="reply-<%= report._id %>" class="block text-sm font-semibold text-gray-700 mb-1">Reply:</label>
+                                <label for="reply-${report._id}" class="block text-sm font-semibold text-gray-700 mb-1">Reply:</label>
                                 <textarea
-                                        id="reply-<%= report._id %>"
+                                        id="reply-${report._id}"
                                         name="reply"
                                         rows="3"
                                         class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                         placeholder="Write your response to the reporter..."
-                                ></textarea>
+                                >${report.reply}</textarea>
                             </div>
 
                             <div class="flex gap-2 flex-wrap">
-                                <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">Send Reply</button>
-                                <button formaction="/AdminPanel/Reports/<%= report._id %>/resolve" formmethod="POST" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">Mark as Resolved</button>
-                                <button formaction="/AdminPanel/Reports/<%= report._id %>/delete-resource" formmethod="POST" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">Delete Resource</button>
+                                <button type="submit" onclick="return confirm('The Message Will Be Sent')"  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">Send Reply</button>
+                                <button onclick="return confirm('Are you sure you want to mark this report as resolved?')" formaction="/AdminPanel/Reports/${report._id}/resolve/${report.by}" formmethod="POST" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">Mark as Resolved</button>
+                                <button formaction="/AdminPanel/Reports/delete-resource/${report.resourceID}" formmethod="POST" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm">Delete Resource</button>
                             </div>
                         </form>
-                    <% } else { %>
+                    </div>`;
+                        }else{
+                            html+=`<div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="mb-3 space-y-1">
+                        <h2 class="text-lg font-semibold text-gray-800">📁 Resource: ${report.resourceTitle}</h2>
+                        <p class="text-sm text-gray-600">By: <span class="text-blue-600 font-medium">${report.reportedByEmail}</span></p>
+                        <p class="text-sm text-gray-600">Reason: <span class="text-red-600 font-medium">${report.reason}</span></p>
+                    </div>
+
+                    <!-- Meta Info -->
+                    <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">Resolved</span>
+                        <span>${report.createdAt.toLocaleString()}</span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-sm text-gray-700 mb-4 flex-1">${report.description}</p>
+
+                    <!-- Admin Reply Form -->
                         <div class="">
                             <label class="block text-sm font-semibold text-gray-700 mb-1" for="reply">Reply (Sent):</label>
                             <textarea
@@ -69,15 +117,33 @@
                                     class="w-full  cursor-not-allowed resize-none border bg-gray-200 border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                     rows="3"
                                     placeholder="Write your response..."
-                            ><%= report.reply || "No reply given." %></textarea>
+                            >${ report.reply || "No reply given." }</textarea>
                         </div>
-                    <% } %>
-                </div>
-            <% }) %>
-        </div>
-    <% } %>
-</main>
+                </div>`;
+                        }
+                    })
+                }else{
+                    html+=`<p class="text-center text-gray-600">No reports to show 🎉</p>`;
+                }
+                resultsContainer.innerHTML = html;
+            })
+    }
+    function debounce(fn, delay) {
+        let timeoutId;
+        return function (...args) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => fn.apply(this, args), delay);
+        };
+    }
 
+    fetchResults();
+    stausSelect?.addEventListener('change', fetchResults);
+
+    document.querySelector('form').addEventListener('submit', e => {
+        e.preventDefault();
+        fetchResults();
+    });
+</script>
 <%- include('footer.ejs') %>
 </body>
 </html>

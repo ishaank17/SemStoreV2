@@ -1,11 +1,19 @@
 import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
 
-const dbPromise = openDB('test-db', 5, {
+export const dbPromise = openDB('test-db', 8, {
     upgrade(db) {
         if (!db.objectStoreNames.contains('fileData')) {
             const store = db.createObjectStore('fileData', { keyPath: 'id',autoIncrement:true });
             store.createIndex('oid', 'oid', { unique: true });
         }
+        if (!db.objectStoreNames.contains('followData')) {
+            const store = db.createObjectStore('followData', {
+                keyPath: 'id',
+                autoIncrement: true,
+            });
+            store.createIndex('code', 'code');
+        }
+
     }
 });
 export async function saveFile(file) {

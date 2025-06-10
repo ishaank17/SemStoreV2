@@ -1,7 +1,7 @@
-import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
+import {dbPromise} from '/js/db.js';
 
 async function syncIDBWithCache() {
-    const db = await openDB('test-db', 5);
+    const db = await dbPromise;
 
     const allFiles = await db.getAll('fileData');
     const cache = await caches.open('offline-files');

@@ -289,15 +289,42 @@ app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
 });
 app.get('/Home/search', requireLogin, async (req, res) => {
     const { q, semester, branch,order } = req.query;
-
+    console.log("Fetching");
     let filter = {};
 
     if (q) {
         filter.$or = [
             { title: { $regex: q, $options: 'i' } },
             { coursecode: { $regex: q, $options: 'i' } },
-            { tags: { $regex: q, $options: 'i' } }
+            { tags: { $regex: q, $options: 'i' } },
+                           // MONITOR THIS
         ];
+    }
+    if (semester) filter.semester = semester;
+    if (branch) filter.branch = branch;
+    // console.log(typeof (order));
+    // console.log("Filter:", JSON.stringify(filter, null, 2));
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
+    res.json(results);
+});
+app.get('/AdminPanel/search', requireAdmin, async (req, res) => {
+    const { q, semester, branch,order } = req.query;
+
+    let filter = {};
+
+    if (q) {
+        const orConditions = [
+            { title: { $regex: q, $options: 'i' } },
+            { coursecode: { $regex: q, $options: 'i' } },
+            { tags: { $regex: q, $options: 'i' } },
+        ];
+
+        // Check if q is valid ObjectId
+        if (mongoose.Types.ObjectId.isValid(q)) {
+            orConditions.push({ _id: q });  // exact match, no regex
+        }
+
+        filter.$or = orConditions;
     }
     if (semester) filter.semester = semester;
     if (branch) filter.branch = branch;
@@ -406,16 +433,22 @@ app.post('/delete/:filename',requireLogin, async (req, res) => {
     }
 });
 
-app.get('/AdminPanel/Content', async (req, res) => {
-    res.render('ManageContent.ejs');
-});
+
 app.get('/AdminPanel/Users', async (req, res) => {
     res.render('ManageUsers.ejs');
 });
 app.get('/AdminPanel/Reports', async (req, res) => {
-    const reports =await report.find()
-    console.log({reports});
-    res.render('ManageReports.ejs',{reports});
+    res.render('ManageReports.ejs');
+})
+app.get('/AdminPanel/GetReports', async (req, res) => {
+    const status = req.query.st;
+    let query = {};
+    if (status === "Pending" || status === "Resolved") {
+        query.status = status;
+    }
+
+    const results = await report.find(query).sort({ createdAt: -1 });
+    res.json(results);
 });
 
 app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
@@ -426,7 +459,7 @@ app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
     } else {
         console.log('❌ Failed to delete file', result.status, result.data);
     }
-    res.redirect('/AdminPanel/Contents');
+    res.redirect('/AdminPanel/Content');
 });
 app.post('/AdminPanel/Users/:id/promote', async (req, res) => {
     const result =await userModel.findOne({ _id: req.params.id });
@@ -492,17 +525,150 @@ app.post("/AdminPanel/Notify/", async (req, res) => {
     res.json({ results });
 });
 app.post("/Subscribe", async (req, res) => {
-    const subData= req.body;
-    const data = await jwt.verify(req.cookies.session, process.env.SECRET);
-    const result = await subscribe.findOne({ id:data._id ,"sub.endpoint": subData.endpoint, });
-    if (!result) {
-        await subscribe.create({ id:data._id ,sub:subData })
+    try {
+        const subData = req.body;
+        const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+
+        const result = await subscribe.findOne({ id: data._id, "sub.endpoint": subData.endpoint });
+        if (!result) {
+            await subscribe.create({ id: data._id, sub: subData });
+        }
+
+        res.sendStatus(200); // ✅ No body, no JSON shown
+    } catch (err) {
+        console.error("Subscribe error:", err);
+        res.sendStatus(500); // ✅ Fail silently on error
     }
-})
+});
 app.get("/AdminPanel/Announce",  (req, res) => {
     res.render('Announce.ejs');
 })
+app.post("/AdminPanel/Reports/:id/reply/:by", async (req, res) => {
+    try {
+        const repoID = req.params.id;
+        const by = req.params.by;
+        const {reply} = req.body;
+        const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+        const result = await report.findOneAndUpdate({_id: repoID}, {
+            reply: reply,
+            replyBy: data._id,
+            repliedAt: new Date().toLocaleDateString()
+        });
 
+        const subs = await subscribe.find({id: by});
+        const payload = JSON.stringify({
+            title: "An Admin has replied to your report !",
+            body: reply
+        });
+
+        const results = [];
+
+        for (const subdata of subs) {
+            const sub = subdata.sub;
+            try {
+                const result = await webpush.sendNotification(sub, payload);
+                console.log("sent");
+                results.push({endpoint: sub.endpoint, success: true});
+            } catch (err) {
+                if (err.statusCode === 404 || err.statusCode === 410) {
+                    // Remove expired subscription from DB
+                    await subscribe.deleteOne({"sub.endpoint": sub.endpoint});
+                    console.log(`Removed expired subscription: ${sub.endpoint}`);
+                    results.push({endpoint: sub.endpoint, success: false, removed: true});
+                } else {
+                    console.error(`Failed to send to ${sub.endpoint}`, err);
+                    results.push({endpoint: sub.endpoint, success: false, error: err.message});
+                }
+            }
+        }
+        return res.redirect("/AdminPanel/Reports");
+    }
+    catch (err) {
+        console.error("Error handling reply:", err);
+        return res.status(500).json({ message: "Server error", error: err.message });
+    }
+})
+
+app.post("/AdminPanel/Reports/:id/resolve/:by", async (req, res) => {
+    try {
+        const repoID = req.params.id;
+        const by = req.params.by;
+        const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+        const result = await report.findOneAndUpdate({_id: repoID}, {
+            replyBy: data._id,
+            status: "Resolved",
+            repliedAt: new Date().toLocaleDateString()
+        });
+
+        const subs = await subscribe.find({id: by});
+        const payload = JSON.stringify({
+            title: "An Admin has replied to your report !",
+            body: "Your Issue has Been Resolved !!!"
+        });
+
+        const results = [];
+
+        for (const subdata of subs) {
+            const sub = subdata.sub;
+            try {
+                const result = await webpush.sendNotification(sub, payload);
+                console.log("sent");
+                results.push({endpoint: sub.endpoint, success: true});
+            } catch (err) {
+                if (err.statusCode === 404 || err.statusCode === 410) {
+                    // Remove expired subscription from DB
+                    await subscribe.deleteOne({"sub.endpoint": sub.endpoint});
+                    console.log(`Removed expired subscription: ${sub.endpoint}`);
+                    results.push({endpoint: sub.endpoint, success: false, removed: true});
+                } else {
+                    console.error(`Failed to send to ${sub.endpoint}`, err);
+                    results.push({endpoint: sub.endpoint, success: false, error: err.message});
+                }
+            }
+        }
+        return res.redirect("/AdminPanel/Reports");
+    }
+    catch (err) {
+        console.error("Error handling reply:", err);
+        return res.status(500).json({ message: "Server error", error: err.message });
+    }
+})
+
+
+app.post("/AdminPanel/Reports/delete-resource/:id", async (req, res) => {
+    try {
+        const id = req.params.id;
+
+        res.redirect(`/AdminPanel/Content/${id}`);
+    } catch (err) {
+        console.error("Error in fake delete route:", err);
+        res.status(500).send("Server Error");
+    }
+});
+// app.get('/AdminPanel/Content', async (req, res) => {
+//     res.render('ManageContent.ejs');
+// });
+app.get('/AdminPanel/Content{/:id}', async (req, res) => {
+    const searchid = req.params.id || null;
+    res.render('ManageContent.ejs', { searchid });
+});
+app.post('/followCourse', async (req, res) => {
+    const { coursecode } = req.body;
+    await content.updateMany(
+        { coursecode },
+        { $inc: { popularity: 1 } }
+    );
+    res.sendStatus(200);
+});
+
+app.post('/unfollowCourse', async (req, res) => {
+    const { coursecode } = req.body;
+    await content.updateMany(
+        { coursecode },
+        { $inc: { popularity: -1 } }
+    );
+    res.sendStatus(200);
+});
 app.listen(80,() => console.log(`Server running on port 80`));
 
 
