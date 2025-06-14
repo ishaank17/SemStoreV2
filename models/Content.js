@@ -10,6 +10,7 @@ const contentSchema = mongoose.Schema({
     description:String,
     type:String,
     uploadedBy:String,
+    uploadedByID:String,
     uploadedAt:String,
     branch: String,
     semester: String,

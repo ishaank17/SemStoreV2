@@ -10,7 +10,7 @@ const userSchema = mongoose.Schema({
     reportedByEmail:String, //email
     reason: String, //rsn - innap outdated others
     description: String, // desc
-    status:String,  //"Pending", or "Resolved"
+    status:{type:String,default:'Pending'} , //"Pending", or "Resolved"
     createdAt: String , //new Date().toLocaleDateString()
     reply: {type:String,default:''},
     replyBy: {type:String,default:''},

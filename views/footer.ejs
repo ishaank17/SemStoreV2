@@ -19,53 +19,57 @@
         <button onclick="clearNotifications()" class="text-sm text-blue-500 hover:underline">Clear All</button>
     </div>
     <ul id="notificationList" class="max-h-80 overflow-y-auto divide-y">
-        <li class="p-4 text-sm text-gray-700">Welcome to Sem-Store!</li>
-        <li class="p-4 text-sm text-gray-700">New notes uploaded in CS101.</li>
-        <li class="p-4 text-sm text-gray-700">Your contributor access is approved.</li>
     </ul>
 </aside>
 <button onclick="togglePanel()" class="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full shadow-xl z-76">
     🔔
 </button>
-<script>
+<script type="module">
+    import { dbPromise } from '/js/db.js';
     function togglePanel() {
         const panel = document.querySelector("aside");
         panel.classList.toggle("hidden");
     }
-    // function showNotification(message) {
-    //     const panel = document.getElementById('notificationPanel');
-    //     const msg = document.getElementById('notificationMessage');
-    //     msg.textContent = message;
-    //     panel.classList.remove('hidden');
-    //     setTimeout(() => {
-    //         panel.classList.add('hidden');
-    //     }, 5000);
-    // }
-    // function closeNotification() {
-    //     document.getElementById('notificationPanel').classList.add('hidden');
-    // }
-// Example trigger
-    // window.addEventListener('load', () => {
-    //     showNotification("You're viewing the latest resources!");
-    // });
+    window.togglePanel = togglePanel;
+
 
     function addNotification(msg) {
         const list = document.getElementById('notificationList');
         const item = document.createElement('li');
         item.className = 'p-4 text-sm text-gray-700';
-        item.textContent = msg;
+        item.innerHTML = `
+    <div class="flex justify-between items-start">
+        <div>
+            <p class="font-semibold text-blue-800">${msg.title}</p>
+            <p class="text-gray-600">${msg.body}</p>
+        </div>
+        <button class="text-red-500 text-xs hover:underline ml-4" onclick="clearByid(${msg.id},this)">✕</button>
+    </div>
+`;
         list.prepend(item); // add new at top
     }
 
-    function clearNotifications() {
-        document.getElementById('notificationList').innerHTML = '';
+    async function clearByid(id,obj) {
+        obj.closest('li').remove();
+        const db=await dbPromise;
+        await db.delete('notifications', id);
     }
-
+    window.clearByid = clearByid;
+    async function clearNotifications() {
+        document.getElementById('notificationList').innerHTML = '';
+        const db=await dbPromise;
+        await db.clear('notifications');
+    }
+    window.clearNotifications = clearNotifications;
     // Example: Show one after page load
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            addNotification("System update tonight at 11 PM.");
-        },2000);
+    window.addEventListener('load', async () => {
+        const db = await dbPromise;
+        const msgs =await db.getAll("notifications");
+        let msg;
+        for(msg  of msgs) {
+            addNotification(msg);
+        }
+
     });
 </script>
 <!--<style>-->

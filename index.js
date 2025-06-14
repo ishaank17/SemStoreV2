@@ -12,6 +12,7 @@ const report=require('./models/Report');
 const subscribe=require('./models/Subs');
 const {requireLogin}=require('./models/LoginCheck');
 const {requireAdmin}=require('./models/AdminCheck');
+const {requireContri}=require('./models/ContriCheck');
 const multer = require('multer');
 const crypto = require('crypto');
 const mime = require('mime-types');
@@ -22,7 +23,6 @@ app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname,"public")));
 app.set('view engine', 'ejs')
-
 
 
 // MULTER
@@ -180,7 +180,15 @@ app.use((req, res, next) => {
     }
     next();
 });
-
+async function fetchCourseCodes(req, res, next) {
+    try {
+        req.courseCodes = await content.distinct('coursecode');
+        next();
+    } catch (err) {
+        console.error('Middleware error:', err);
+        next(err); // pass error to error handler
+    }
+}
 
 //GOOGLE OAUTH2
 const {OAuth2Client, JWT} = require('google-auth-library');
@@ -277,8 +285,8 @@ app.post('/Create', async (req, res) => {
 
     res.redirect('/Home');
 })
-app.get('/Home',  requireLogin,async(req, res) => {
-    res.render('Home.ejs');
+app.get('/Home', fetchCourseCodes, requireLogin,async(req, res) => {
+    res.render('Home.ejs',{ courseCodes: req.courseCodes });
 
 })
 app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
@@ -335,7 +343,7 @@ app.get('/AdminPanel/search', requireAdmin, async (req, res) => {
 });
 
 
-app.get('/AdminPanel/Users/search', requireLogin, async (req, res) => {
+app.get('/AdminPanel/Users/search', requireAdmin, async (req, res) => {
     const { q, role } = req.query;
 
     let filter = {};
@@ -367,13 +375,13 @@ app.get('/AdminPanel',requireAdmin, (req, res) => {
 app.get('/Downloads',requireLogin, (req, res) => {
     res.render('Downloads.ejs');
 })
-app.get('/Upload',requireAdmin, (req, res) => {
+app.get('/Upload',requireContri, (req, res) => {
     res.render('Upload.ejs');
 })
-app.get('/ref',requireAdmin, (req, res) => {
-    res.render('refpanel.ejs');
-})
-app.post('/UploadFile',requireLogin,upload.single("file_input") ,async (req, res) => {
+// app.get('/ref',requireAdmin, (req, res) => {
+//     res.render('refpanel.ejs');
+// })
+app.post('/UploadFile',requireContri,upload.single("file_input") ,async (req, res) => {
     const {code , title ,desc , tags , branch ,sem }= req.body;
     const url= await uploadGoogle(req.file.filename);
     fs.unlink(`public/contents/${req.file.filename}`, (err) => {
@@ -384,17 +392,21 @@ app.post('/UploadFile',requireLogin,upload.single("file_input") ,async (req, res
         }
     });
     let date = new Date().toLocaleDateString();
+    const result=await content.findOne({coursecode: code})
+    const pop=result?.popularity??0;
     await content.create({
         coursecode: code,
         title,
         description:desc,
         type:path.extname(req.file.originalname).slice(1).toUpperCase(),
         uploadedBy:jwt.verify(req.cookies.session, process.env.SECRET).name,
+        uploadedByID:jwt.verify(req.cookies.session, process.env.SECRET)._id,
         uploadedAt:date,
         branch,
         semester: sem,
         path:url,
         tags,
+        popularity: pop,
     })
     console.log("done uploading")
     res.redirect('Upload');
@@ -434,13 +446,13 @@ app.post('/delete/:filename',requireLogin, async (req, res) => {
 });
 
 
-app.get('/AdminPanel/Users', async (req, res) => {
+app.get('/AdminPanel/Users', requireAdmin,async (req, res) => {
     res.render('ManageUsers.ejs');
 });
-app.get('/AdminPanel/Reports', async (req, res) => {
+app.get('/AdminPanel/Reports',requireAdmin, async (req, res) => {
     res.render('ManageReports.ejs');
 })
-app.get('/AdminPanel/GetReports', async (req, res) => {
+app.get('/AdminPanel/GetReports',requireAdmin ,async (req, res) => {
     const status = req.query.st;
     let query = {};
     if (status === "Pending" || status === "Resolved") {
@@ -461,7 +473,7 @@ app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
     }
     res.redirect('/AdminPanel/Content');
 });
-app.post('/AdminPanel/Users/:id/promote', async (req, res) => {
+app.post('/AdminPanel/Users/:id/promote',requireAdmin, async (req, res) => {
     const result =await userModel.findOne({ _id: req.params.id });
     let roles="";
     if(result.role==='Student')  roles = "Contributor";
@@ -471,7 +483,7 @@ app.post('/AdminPanel/Users/:id/promote', async (req, res) => {
     res.redirect('/AdminPanel/Users');
 
 });
-app.post('/AdminPanel/Users/:id/demote', async (req, res) => {
+app.post('/AdminPanel/Users/:id/demote',requireAdmin, async (req, res) => {
     const result =await userModel.findOne({ _id: req.params.id });
     let roles="";
     if(result.role==='Contributor')  roles = "Student";
@@ -480,7 +492,7 @@ app.post('/AdminPanel/Users/:id/demote', async (req, res) => {
     await userModel.updateOne({ _id: req.params.id },{role:roles})
     res.redirect('/AdminPanel/Users');
 });
-app.post('/AdminPanel/Users/:id/delete', async (req, res) => {
+app.post('/AdminPanel/Users/:id/delete',requireAdmin, async (req, res) => {
     const result =await userModel.deleteOne({_id: req.params.id});
     res.redirect('/AdminPanel/Users');
 
@@ -494,7 +506,7 @@ webpush.setVapidDetails(
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
 );
-app.post("/AdminPanel/Notify/", async (req, res) => {
+app.post("/AdminPanel/Notify/",requireAdmin, async (req, res) => {
     const subs = await subscribe.find();
     const payload = JSON.stringify({
         title: req.body.title,
@@ -540,10 +552,10 @@ app.post("/Subscribe", async (req, res) => {
         res.sendStatus(500); // ✅ Fail silently on error
     }
 });
-app.get("/AdminPanel/Announce",  (req, res) => {
+app.get("/AdminPanel/Announce",requireAdmin,  (req, res) => {
     res.render('Announce.ejs');
 })
-app.post("/AdminPanel/Reports/:id/reply/:by", async (req, res) => {
+app.post("/AdminPanel/Reports/:id/reply/:by",requireAdmin, async (req, res) => {
     try {
         const repoID = req.params.id;
         const by = req.params.by;
@@ -589,7 +601,7 @@ app.post("/AdminPanel/Reports/:id/reply/:by", async (req, res) => {
     }
 })
 
-app.post("/AdminPanel/Reports/:id/resolve/:by", async (req, res) => {
+app.post("/AdminPanel/Reports/:id/resolve/:by",requireAdmin, async (req, res) => {
     try {
         const repoID = req.params.id;
         const by = req.params.by;
@@ -635,7 +647,7 @@ app.post("/AdminPanel/Reports/:id/resolve/:by", async (req, res) => {
 })
 
 
-app.post("/AdminPanel/Reports/delete-resource/:id", async (req, res) => {
+app.post("/AdminPanel/Reports/delete-resource/:id",requireAdmin, async (req, res) => {
     try {
         const id = req.params.id;
 
@@ -648,11 +660,11 @@ app.post("/AdminPanel/Reports/delete-resource/:id", async (req, res) => {
 // app.get('/AdminPanel/Content', async (req, res) => {
 //     res.render('ManageContent.ejs');
 // });
-app.get('/AdminPanel/Content{/:id}', async (req, res) => {
+app.get('/AdminPanel/Content{/:id}',requireAdmin, async (req, res) => {
     const searchid = req.params.id || null;
     res.render('ManageContent.ejs', { searchid });
 });
-app.post('/followCourse', async (req, res) => {
+app.post('/followCourse',requireLogin, async (req, res) => {
     const { coursecode } = req.body;
     await content.updateMany(
         { coursecode },
@@ -661,13 +673,72 @@ app.post('/followCourse', async (req, res) => {
     res.sendStatus(200);
 });
 
-app.post('/unfollowCourse', async (req, res) => {
+app.post('/unfollowCourse',requireLogin, async (req, res) => {
     const { coursecode } = req.body;
     await content.updateMany(
         { coursecode },
         { $inc: { popularity: -1 } }
     );
     res.sendStatus(200);
+});
+
+
+app.post('/ReportResource',requireLogin, async (req, res) => {
+    const {id,code,reason,details} = req.body;
+    const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+    await report.create({
+        by:data._id,
+        resourceTitle:id,
+        reportedByEmail:data.email,
+        reason:reason,
+        description:details,
+        createdAt:new Date().toLocaleDateString(),
+    })
+    res.sendStatus(200);
+})
+
+app.get('/ManageUpload',requireContri, async (req, res) => {
+    res.render('ManageUpload.ejs');
+})
+
+app.get('/ManageUpload/search', requireAdmin, async (req, res) => {
+    const { q, semester, branch,order } = req.query;
+    const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+
+    let filter = {};
+
+    if (q) {
+        const orConditions = [
+            { title: { $regex: q, $options: 'i' } },
+            { coursecode: { $regex: q, $options: 'i' } },
+            { tags: { $regex: q, $options: 'i' } },
+        ];
+
+        // Check if q is valid ObjectId
+        if (mongoose.Types.ObjectId.isValid(q)) {
+            orConditions.push({ _id: q });  // exact match, no regex
+        }
+
+        filter.$or = orConditions;
+    }
+    if (semester) filter.semester = semester;
+    if (branch) filter.branch = branch;
+    filter.uploadedByID = data._id;
+    // console.log(typeof (order));
+    // console.log("Filter:", JSON.stringify(filter, null, 2));
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
+    res.json(results);
+});
+
+app.get('/ManageUpload/Delete/:id/:_id',requireAdmin, async (req, res) => {
+    const result =await deleteGoogleFile(req.params.id);
+    if (result.status === 204) {
+        const resu = await content.deleteOne({ _id: req.params._id });
+        console.log("Successfully deleted Content",resu );
+    } else {
+        console.log('❌ Failed to delete file', result.status, result.data);
+    }
+    res.redirect('/ManageUpload');
 });
 app.listen(80,() => console.log(`Server running on port 80`));
 

@@ -1,13 +1,12 @@
 if('serviceWorker' in navigator) {
     // console.log("HERE");
-    navigator.serviceWorker.register('/sw.js')
+    navigator.serviceWorker.register('/sw.js',{ type: 'module' })
         .then((reg)=>{console.log('ServiceWorker Registered',reg)})
         .catch(e=>{console.log('ServiceWorker Not Registered :',e)});
 }else{
     console.log("NOT THERE");
 }
 let deferredPrompt;
-
 window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;

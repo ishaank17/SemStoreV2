@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'sem-store-v23';
+const CACHE_NAME = 'sem-store-v24';
 const urlsToCache = [
     '/manifest.json',
     '/startSW.js',
@@ -148,9 +148,10 @@ self.addEventListener('fetch', event => {
 //     });
 // }
 
-self.addEventListener('push', (event) => {
+import { dbPromise } from '/js/db.js';
+self.addEventListener('push', async (event) => {
     let data = { title: "Default title", body: "Default message" };
-
+    const db = await dbPromise;
     if (event.data) {
         try {
             data = event.data.json();  // parse JSON payload
@@ -161,9 +162,11 @@ self.addEventListener('push', (event) => {
 
     const options = {
         body: data.body,
-        // You can add icon, badge etc. here too
-    };
+        //img if needed
 
+    };
+    console.log("Notification Stored");
+    db.add("notifications", event.data.json());
     event.waitUntil(
         self.registration.showNotification(data.title, options)
     );

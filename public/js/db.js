@@ -1,6 +1,6 @@
 import { openDB } from 'https://cdn.jsdelivr.net/npm/idb@8/+esm';
 
-export const dbPromise = openDB('test-db', 8, {
+export const dbPromise = openDB('test-db', 9, {
     upgrade(db) {
         if (!db.objectStoreNames.contains('fileData')) {
             const store = db.createObjectStore('fileData', { keyPath: 'id',autoIncrement:true });
@@ -13,7 +13,13 @@ export const dbPromise = openDB('test-db', 8, {
             });
             store.createIndex('code', 'code');
         }
-
+        if (!db.objectStoreNames.contains('notifications')) {
+            const store = db.createObjectStore('notifications', {
+                keyPath: 'id',
+                autoIncrement: true,
+            });
+            store.createIndex('id', 'id');
+        }
     }
 });
 export async function saveFile(file) {
