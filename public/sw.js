@@ -1,5 +1,17 @@
 
-const CACHE_NAME = 'sem-store-v25';
+const CACHE_NAME = 'sem-store-v31';
+// caches.keys().then(keys => {
+//     keys.forEach(key => {
+//         if (key.startsWith('sem-store-') && key !== CACHE_NAME) {
+//             caches.delete(key).then(success => {
+//                 if (success) {
+//                     console.log(`🧹 Deleted old cache: ${key}`);
+//                 }
+//             });
+//         }
+//     });
+// });
+
 const urlsToCache = [
     '/manifest.json',
     '/startSW.js',
