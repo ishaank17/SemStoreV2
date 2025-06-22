@@ -381,6 +381,7 @@ app.get('/Upload',requireContri, (req, res) => {
 // app.get('/ref',requireAdmin, (req, res) => {
 //     res.render('refpanel.ejs');
 // })
+//test
 app.post('/UploadFile',requireContri,upload.single("file_input") ,async (req, res) => {
     const {code , title ,desc , tags , branch ,sem }= req.body;
     const url= await uploadGoogle(req.file.filename);
