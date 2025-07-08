@@ -17,6 +17,7 @@ const multer = require('multer');
 const crypto = require('crypto');
 const mime = require('mime-types');
 const mongoose = require('mongoose');
+const fs=require('fs');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -43,10 +44,9 @@ const storage = multer.diskStorage({
 
     }
 })
-const upload = multer({ storage: storage })
-
+// const upload = multer({ storage: storage })
+const upload = multer({ storage: multer.memoryStorage() });
 //UPLOAD TO GOOGLE
-const fs=require('fs');
 const {google} = require('googleapis');
 const apikeys= {
     "type": "service_account",
@@ -72,84 +72,38 @@ async function authorize() {
     await jwtClient.authorize();
     return jwtClient;
 }
-async function uploadFile(authClient,filename){
-    return new Promise((resolve,rejected)=>{
-        const drive = google.drive({version:'v3',auth:authClient});
-        const mimeType = mime.lookup(filename) || 'application/octet-stream';
-        var fileMetaData = {
-            name:`${filename}`,
-            parents:['1W9QcqqyhnKRsC7bN5j_--qdSgxXx8sxO'] // A folder ID to which file will get uploaded
-        }
 
-        drive.files.create({
-            resource:fileMetaData,
-            media:{
-                body: fs.createReadStream(`public/contents/${filename}`), // files that will get uploaded
-                mimeType:mimeType
+function uploadGCS (file) {
+    return new Promise((resolve, reject) =>{
+    const fileName = Date.now() + "_" + file.originalname;
+        const blob = bucket.file(fileName);
+        const blobStream = blob.createWriteStream({
+            metadata: {
+                contentType: file.mimetype,
             },
-            fields:'id'
-        },function(error,file){
-            if(error){
-                return rejected(error)
-            }
-            resolve(file);
-        })
+        });
+
+        blobStream.on("error", err => reject(err));
+
+        blobStream.on("finish", () => {
+            const publicUrl = `/files/${fileName}`;
+            resolve(publicUrl);
+        });
+
+        blobStream.end(file.buffer);
     });
 }
-function uploadGoogle (fname) {
-    return authorize()
-        .then(auth => uploadFile(auth, fname))
-        .then(file => {
-            const fileId = file.data.id;
-            const url = `https://drive.google.com/file/d/${fileId}/view`;
-            console.log("Drive URL:", url);
-            return url;
-        }).catch(e=>console.log("Error while uploading:",e));
-}
 
 
 
-async function downloadFile(fileId, destination) {
-    const auth = new google.auth.GoogleAuth({
-        keyFile:'apikeys.json', // Replace with path to your JSON file
-        scopes: ['https://www.googleapis.com/auth/drive.readonly'],
-    });
 
-    const drive = google.drive({ version: 'v3', auth });
-    // console.log("Here",fileId);
-    const { data: metadata } = await drive.files.get({fileId} );
-    // console.log("Metadata",metadata);
-    const fileName = metadata.name ;
-    const fullDest = path.resolve(destination, fileName);
-    // console.log("FUll DESt",fullDest);
-    const res = await drive.files.get(
-        { fileId, alt: 'media' },
-        { responseType: 'stream' }
-    );
-
-    const dest = fs.createWriteStream(fullDest);
-    await new Promise((resolve, reject) => {
-        res.data
-            .on('end', () => {
-                console.log('✅ File downloaded successfully');
-                resolve();
-            })
-            .on('error', err => {
-                console.error('❌ Error downloading file', err);
-                reject(err);
-            })
-            .pipe(dest);
-    });
-    return fullDest;
-}
-async function deleteGoogleFile(fileId) {
-    const auth = new google.auth.GoogleAuth({
-        keyFile:'apikeys.json', // Replace with path to your JSON file
-        scopes: ['https://www.googleapis.com/auth/drive.file'],
-    });
-
-    const drive = google.drive({ version: 'v3', auth });
-    return  res = await drive.files.delete({ fileId: fileId });
+async function deleteGCSFile(filename) {
+    try {
+        await bucket.file(filename).delete();
+        console.log(`🗑️ Deleted file ${filename}`);
+    } catch (err) {
+        console.error('❌ Failed to delete file:', err);
+    }
 }
 
 
@@ -158,6 +112,40 @@ async function deleteGoogleFile(fileId) {
 
 
 
+
+
+
+const { Storage } = require('@google-cloud/storage');
+const gcsstorage = new Storage({
+    projectId: process.env.GCS_PROJECT_ID,
+    credentials: {
+        client_email: process.env.GCS_CLIENT_EMAIL,
+        private_key: process.env.GCS_PRIVATE_KEY.replace(/\\n/g, '\n')
+    },
+});
+
+const bucket = gcsstorage.bucket('semstore');
+app.get('/files/:filename',requireLogin, async (req, res) => {
+    const filename = req.params.filename;
+    const file = bucket.file(filename);
+
+    try {
+        // Check if file exists
+        const [exists] = await file.exists();
+        if (!exists) return res.status(404).send('File not found');
+
+        // Get metadata for content-type
+        const [metadata] = await file.getMetadata();
+        res.setHeader('Content-Type', metadata.contentType || 'application/octet-stream');
+        res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
+        res.setHeader('Cache-Control', 'public, max-age=31536000'); // 1 year browser cache
+
+        file.createReadStream().pipe(res);
+    } catch (err) {
+        console.error('❌ GCS fetch error:', err);
+        res.status(500).send('Internal server error');
+    }
+});
 
 
 
@@ -378,40 +366,37 @@ app.get('/Downloads',requireLogin, (req, res) => {
 app.get('/Upload',requireContri, (req, res) => {
     res.render('Upload.ejs');
 })
-// app.get('/ref',requireAdmin, (req, res) => {
-//     res.render('refpanel.ejs');
-// })
-//test
+
 app.post('/UploadFile',requireContri,upload.single("file_input") ,async (req, res) => {
-    const {code , title ,desc , tags , branch ,sem }= req.body;
-    const url= await uploadGoogle(req.file.filename);
-    fs.unlink(`public/contents/${req.file.filename}`, (err) => {
-        if (err) {
-            console.error("Failed to delete file after upload:", err);
-        } else {
-            console.log("File deleted successfully after upload");
-        }
-    });
-    let date = new Date().toLocaleDateString();
-    const result=await content.findOne({coursecode: code})
-    const pop=result?.popularity??0;
-    await content.create({
-        coursecode: code,
-        title,
-        description:desc,
-        type:path.extname(req.file.originalname).slice(1).toUpperCase(),
-        uploadedBy:jwt.verify(req.cookies.session, process.env.SECRET).name,
-        uploadedByID:jwt.verify(req.cookies.session, process.env.SECRET)._id,
-        uploadedAt:date,
-        branch,
-        semester: sem,
-        path:url,
-        tags,
-        popularity: pop,
-    })
-    console.log("done uploading")
-    res.redirect('Upload');
-})
+    try{
+        const {code , title ,desc , tags , branch ,sem }= req.body;
+        const url= await uploadGCS(req.file);
+
+
+        let date = new Date().toLocaleDateString();
+        const result=await content.findOne({coursecode: code})
+        const pop=result?.popularity??0;
+        await content.create({
+            coursecode: code,
+            title,
+            description:desc,
+            type:path.extname(req.file.originalname).slice(1).toUpperCase(),
+            uploadedBy:jwt.verify(req.cookies.session, process.env.SECRET).name,
+            uploadedByID:jwt.verify(req.cookies.session, process.env.SECRET)._id,
+            uploadedAt:date,
+            branch,
+            semester: sem,
+            path:url,
+            tags,
+            popularity: pop,
+        })
+        console.log("done uploading")
+        res.redirect('Upload');
+    } catch (err) {
+        console.error("❌ Upload failed:", err);
+        res.status(500).send("Upload failed");
+    }
+});
 app.get("/contents/:file",requireLogin, (req, res) => {
     const fullPath = path.resolve("public/contents", req.params.file);
     res.sendFile(fullPath);
@@ -426,6 +411,7 @@ app.get("/api/file/:id",requireLogin, async (req, res) => {
         res.status(500).json({ error: "Failed to get file metadata" });
     }
 });
+
 app.post('/delete/:filename',requireLogin, async (req, res) => {
     const filename = req.params.filename;
     const filePath = path.resolve('public/contents', filename);
@@ -450,7 +436,8 @@ app.post('/delete/:filename',requireLogin, async (req, res) => {
 app.get('/AdminPanel/Users', requireAdmin,async (req, res) => {
     res.render('ManageUsers.ejs');
 });
-app.get('/AdminPanel/Reports',requireAdmin, async (req, res) => {
+app.get('/AdminPanel/Reports',requireAdmin,  (req, res) => {
+    console.log("Rendering reports");
     res.render('ManageReports.ejs');
 })
 app.get('/AdminPanel/GetReports',requireAdmin ,async (req, res) => {
@@ -689,7 +676,8 @@ app.post('/ReportResource',requireLogin, async (req, res) => {
     const data = await jwt.verify(req.cookies.session, process.env.SECRET);
     await report.create({
         by:data._id,
-        resourceTitle:id,
+        resourceTitle:code,
+        resourceID:id,
         reportedByEmail:data.email,
         reason:reason,
         description:details,
