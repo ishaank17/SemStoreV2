@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'sem-store-v31';
+const CACHE_NAME = 'sem-store-v32';
 // caches.keys().then(keys => {
 //     keys.forEach(key => {
 //         if (key.startsWith('sem-store-') && key !== CACHE_NAME) {
