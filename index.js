@@ -72,7 +72,6 @@ async function authorize() {
     await jwtClient.authorize();
     return jwtClient;
 }
-
 function uploadGCS (file) {
     return new Promise((resolve, reject) =>{
     const fileName = Date.now() + "_" + file.originalname;
