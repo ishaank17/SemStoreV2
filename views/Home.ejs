@@ -589,20 +589,13 @@
     async function cachefile(fileUrl,fileTitle,btn,ID) {
         try {
             showLoader();
-            // // 1. Get the filename from backend
-            // const response = await fetch(`/api/file/${fileId}`);
-            // const { fileUrl } = await response.json();
-
-
             saveFile({title:fileTitle,link:fileUrl,oid:ID});
-            // 2. Fetch the actual file content
             const fileResponse = await fetch(fileUrl); // real file path
             if (!fileResponse.ok) throw new Error("Failed to fetch file");
 
             // 3. Cache with friendly name
             const cache = await caches.open("offline-files");
             await cache.put(fileUrl, fileResponse.clone());
-            // const res=await fetch(`/delete/${fileName}`, { method: 'POST' });
 
             const img = btn.parentElement.querySelector('img');
             if (img) {

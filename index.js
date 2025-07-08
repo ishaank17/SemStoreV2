@@ -72,9 +72,20 @@ async function authorize() {
     await jwtClient.authorize();
     return jwtClient;
 }
+
+
+
+function generateUniqueFilename(originalName) {
+    const timestamp = Date.now();  // current time in ms
+    const random = crypto.randomBytes(3).toString('hex');  // 6-char hex string
+    const base = path.basename(originalName, path.extname(originalName));
+    const ext = path.extname(originalName);
+    return `${base}-${timestamp}-${random}${ext}`;
+}
+
 function uploadGCS (file) {
     return new Promise((resolve, reject) =>{
-    const fileName = Date.now() + "_" + file.originalname;
+    const fileName = generateUniqueFilename(file.originalname);
         const blob = bucket.file(fileName);
         const blobStream = blob.createWriteStream({
             metadata: {
@@ -92,28 +103,15 @@ function uploadGCS (file) {
         blobStream.end(file.buffer);
     });
 }
-
-
-
-
 async function deleteGCSFile(filename) {
     try {
-        await bucket.file(filename).delete();
+          await bucket.file(filename).delete();
         console.log(`🗑️ Deleted file ${filename}`);
     } catch (err) {
         console.error('❌ Failed to delete file:', err);
     }
+
 }
-
-
-
-
-
-
-
-
-
-
 const { Storage } = require('@google-cloud/storage');
 const gcsstorage = new Storage({
     projectId: process.env.GCS_PROJECT_ID,
@@ -411,25 +409,25 @@ app.get("/api/file/:id",requireLogin, async (req, res) => {
     }
 });
 
-app.post('/delete/:filename',requireLogin, async (req, res) => {
-    const filename = req.params.filename;
-    const filePath = path.resolve('public/contents', filename);
-
-    try {
-        fs.unlink(filePath, (err) => {
-            if (err) {
-                console.error("Failed to delete file after cache:", err);
-            } else {
-                console.log("File deleted successfully after cache");
-            }
-        });
-        console.log(`Deleted file: ${filename}`);
-        res.json({ success: true });
-    } catch (err) {
-        console.error(`Error deleting file: ${filename}`, err);
-        res.status(500).json({ error: 'Failed to delete file' });
-    }
-});
+// app.post('/delete/:filename',requireLogin, async (req, res) => {
+//     const filename = req.params.filename;
+//     const filePath = path.resolve('public/contents', filename);
+//
+//     try {
+//         fs.unlink(filePath, (err) => {
+//             if (err) {
+//                 console.error("Failed to delete file after cache:", err);
+//             } else {
+//                 console.log("File deleted successfully after cache");
+//             }
+//         });
+//         console.log(`Deleted file: ${filename}`);
+//         res.json({ success: true });
+//     } catch (err) {
+//         console.error(`Error deleting file: ${filename}`, err);
+//         res.status(500).json({ error: 'Failed to delete file' });
+//     }
+// });
 
 
 app.get('/AdminPanel/Users', requireAdmin,async (req, res) => {
@@ -450,14 +448,17 @@ app.get('/AdminPanel/GetReports',requireAdmin ,async (req, res) => {
     res.json(results);
 });
 
-app.get('/AdminPanel/Delete/:id/:_id',requireAdmin, async (req, res) => {
-    const result =await deleteGoogleFile(req.params.id);
-    if (result.status === 204) {
+app.get('/AdminPanel/Delete/:file/:_id',requireAdmin, async (req, res) => {
+
+    try {
+        await deleteGCSFile(req.params.file);
+
         const resu = await content.deleteOne({ _id: req.params._id });
-        console.log("Successfully deleted Content",resu );
-    } else {
-        console.log('❌ Failed to delete file', result.status, result.data);
+        console.log("✅ Successfully deleted content:", resu);
+    } catch (err) {
+        console.error('❌ Failed during deletion:', err);
     }
+
     res.redirect('/AdminPanel/Content');
 });
 app.post('/AdminPanel/Users/:id/promote',requireAdmin, async (req, res) => {
@@ -637,10 +638,9 @@ app.post("/AdminPanel/Reports/:id/resolve/:by",requireAdmin, async (req, res) =>
 app.post("/AdminPanel/Reports/delete-resource/:id",requireAdmin, async (req, res) => {
     try {
         const id = req.params.id;
-
         res.redirect(`/AdminPanel/Content/${id}`);
     } catch (err) {
-        console.error("Error in fake delete route:", err);
+        console.error("Error in delete route:", err);
         res.status(500).send("Server Error");
     }
 });
@@ -718,14 +718,16 @@ app.get('/ManageUpload/search', requireAdmin, async (req, res) => {
     res.json(results);
 });
 
-app.get('/ManageUpload/Delete/:id/:_id',requireAdmin, async (req, res) => {
-    const result =await deleteGoogleFile(req.params.id);
-    if (result.status === 204) {
+app.get('/ManageUpload/Delete/:file/:_id',requireContri, async (req, res) => {
+    try {
+        await deleteGCSFile(req.params.file);
+
         const resu = await content.deleteOne({ _id: req.params._id });
-        console.log("Successfully deleted Content",resu );
-    } else {
-        console.log('❌ Failed to delete file', result.status, result.data);
+        console.log("✅ Successfully deleted content:", resu);
+    } catch (err) {
+        console.error('❌ Failed during deletion:', err);
     }
+
     res.redirect('/ManageUpload');
 });
 app.listen(80,() => console.log(`Server running on port 80`));

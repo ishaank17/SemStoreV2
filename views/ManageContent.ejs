@@ -258,7 +258,7 @@
             <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedBy}</td>
             <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedAt}</td>
             <td>
-              <button onclick="deleteFile(extractDriveId('${resource.path}'),'${resource._id}')" class="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-3 py-1 rounded-md">Delete</button>
+              <button onclick="deleteFile('${resource.path}','${resource._id}')" class="bg-red-500 hover:bg-red-600 active:bg-red-700 text-white px-3 py-1 rounded-md">Delete</button>
             </td>
           </tr>`;
                     }));
@@ -274,7 +274,7 @@
                                     <span class="text-gray-600 text-xs">${resource.title}</span>
                                 </div>
                             </a>
-                            <button onclick="deleteFile(extractDriveId('${resource.path}'),'${resource._id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md">Delete</button>
+                            <button onclick="deleteFile('${resource.path}','${resource._id}')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md">Delete</button>
                         </div>
                         <a href="${resource.path}">
                             <p class="text-gray-700 text-sm">${resource.description}</p>
@@ -320,31 +320,18 @@
         function hideLoader() {
             document.getElementById('loader').classList.add('hidden');
         }
-        async function deleteFile(fileid,_id) {
+        async function deleteFile(filepath,_id) {
             if (confirm("Are you sure you want to delete this file?"))
             {   showLoader();
+                var file=filepath.split("/").pop();
                 console.log("Starting deletion")
-                await fetch(`/AdminPanel/Delete/${fileid}/${_id}`);
+                await fetch(`/AdminPanel/Delete/${file}/${_id}`);
                 hideLoader();
                 window.location.reload();
             }
         }
 
 
-        function extractDriveId(url) {
-            const patterns = [
-                /\/d\/([a-zA-Z0-9_-]+)/,             // /d/FILE_ID
-                /id=([a-zA-Z0-9_-]+)/,               // id=FILE_ID
-                /\/folders\/([a-zA-Z0-9_-]+)/        // /folders/FOLDER_ID
-            ];
-
-            for (const pattern of patterns) {
-                const match = url.match(pattern);
-                if (match && match[1]) return match[1];
-            }
-
-            return null; // No ID found
-        }
 
 
 </script>
