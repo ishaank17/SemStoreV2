@@ -182,6 +182,7 @@
 
                     <th class=" p-3 text-sm font-semibold tracking-wide text-left w-max">Title</th>
                     <th class=" p-3 text-sm font-semibold tracking-wide text-left">Available</th>
+                    <th class=" p-3 text-sm font-semibold tracking-wide text-left">Action</th>
                 </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100" id="results">
@@ -197,6 +198,7 @@
 </main>
 <script type="module">
     import {getAll} from "/js/db.js";
+    import {dbPromise} from '/js/db.js';
     const resultsContainer = document.getElementById('results'); // Create this div or UL for results
     const resultsContainer2 = document.getElementById('resultsmobile');
     const data = await getAll();
@@ -209,9 +211,30 @@
             <td>
                 <img src="images/tick.png" alt="Available offline" style="width:30px;height:30px;">
             </td>
+            <td>
+                            <button onclick="deleteCache('${files.link}',${files.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md">Delete</button>
+            </td>
           </tr>`
     }
     resultsContainer.innerHTML = rows;
+    async function deleteCache(urlToDelete,id){
+        const cacheName = 'offline-files';
+        const db = await dbPromise;
+        await db.delete('fileData',id)
+        caches.open(cacheName)
+            .then(cache =>  {
+                cache.delete(urlToDelete)
+                .then(success => {
+                if (success) {
+                    console.log(`✅ ${urlToDelete} was deleted from cache.`);
+                } else {
+                    console.log(`❌ ${urlToDelete} not found in cache.`);
+                }
+            });
+        });
+        window.location.reload();
+    }
+    window.deleteCache = deleteCache;
 
 </script>
 
