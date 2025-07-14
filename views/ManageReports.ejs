@@ -15,7 +15,7 @@
 <%- include('navbar.ejs') %>
 
 <main class="flex-grow p-6 min-w-[90vw] mx-auto">
-    <h1 class="text-3xl font-bold text-blue-700 text-center mb-8">Manage Reports & Feedbacksss</h1>
+    <h1 class="text-3xl font-bold text-blue-700 text-center mb-8">Manage Reports & Feedbacks</h1>
     <form action="javascript:void(0)" class="mb-6" id="forms">
         <label for="status" class="font-semibold text-sm mr-2">Filter by Status:</label>
         <select name="status" id="status" class="border border-gray-300 rounded-md px-2 py-1 text-sm" >
@@ -52,12 +52,15 @@
                 let html = "";
                 if (data.length !== 0) {
                     data.forEach(report => {
+                        var reportTitle;
+                        if(report.resourceID !== undefined)reportTitle="📁 Resource:"
+                        else reportTitle="🌐 Location:"
                         if(report.status!=='Resolved') {
-                            console.log(report);
-                            html+=`<div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
+                            if(report.resourceID !== undefined)
+                                html+=`<div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
                     <!-- Header -->
                     <div class="mb-3 space-y-1">
-                        <h2 class="text-lg font-semibold text-gray-800">📁 Resource: ${report.resourceTitle}</h2>
+                        <h2 class="text-lg font-semibold text-gray-800">${reportTitle} ${report.resourceTitle}</h2>
                         <p class="text-sm text-gray-600">By: <span class="text-blue-600 font-medium">${report.reportedByEmail}</span></p>
                         <p class="text-sm text-gray-600">Reason: <span class="text-red-600 font-medium">${report.reason}</span></p>
                     </div>
@@ -91,11 +94,50 @@
                             </div>
                         </form>
                     </div>`;
-                        }else{
+                            else
+                                html+=`<div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
+                    <!-- Header -->
+                    <div class="mb-3 space-y-1">
+                        <h2 class="text-lg font-semibold text-gray-800">${reportTitle} ${report.resourceTitle}</h2>
+                        <p class="text-sm text-gray-600">By: <span class="text-blue-600 font-medium">${report.reportedByEmail}</span></p>
+                        <p class="text-sm text-gray-600">Reason: <span class="text-red-600 font-medium">${report.reason}</span></p>
+                    </div>
+
+                    <!-- Meta Info -->
+                    <div class="flex justify-between items-center text-sm text-gray-500 mb-3">
+                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs font-medium">Pending</span>
+                        <span>${report.createdAt.toLocaleString()}</span>
+                    </div>
+
+                    <!-- Description -->
+                    <p class="text-sm text-gray-700 mb-4 flex-1">${report.description}</p>
+
+                    <!-- Admin Reply Form -->
+                        <form action="/AdminPanel/Reports/${report._id}/reply/${report.by}" method="POST" class="space-y-3">
+                            <div>
+                                <label for="reply-${report._id}" class="block text-sm font-semibold text-gray-700 mb-1">Reply:</label>
+                                <textarea
+                                        id="reply-${report._id}"
+                                        name="reply"
+                                        rows="3"
+                                        class="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                        placeholder="Write your response to the reporter..."
+                                >${report.reply}</textarea>
+                            </div>
+
+                            <div class="flex justify-center gap-2 flex-wrap">
+                                <button type="submit" onclick="return confirm('The Message Will Be Sent')"  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm">Send Reply</button>
+                                <button onclick="return confirm('Are you sure you want to mark this report as resolved?')" formaction="/AdminPanel/Reports/${report._id}/resolve/${report.by}" formmethod="POST" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm">Mark as Resolved</button>
+                            </div>
+                        </form>
+                    </div>`;
+
+                        }
+                        else{
                             html+=`<div class="bg-white shadow-md rounded-xl p-5 flex flex-col h-full">
                     <!-- Header -->
                     <div class="mb-3 space-y-1">
-                        <h2 class="text-lg font-semibold text-gray-800">📁 Resource: ${report.resourceTitle}</h2>
+                        <h2 class="text-lg font-semibold text-gray-800">${reportTitle} ${report.resourceTitle}</h2>
                         <p class="text-sm text-gray-600">By: <span class="text-blue-600 font-medium">${report.reportedByEmail}</span></p>
                         <p class="text-sm text-gray-600">Reason: <span class="text-red-600 font-medium">${report.reason}</span></p>
                     </div>
@@ -123,7 +165,8 @@
                 </div>`;
                         }
                     })
-                }else{
+                }
+                else{
                     html+=`<p class="text-center text-gray-600">No reports to show 🎉</p>`;
                 }
                 resultsContainer.innerHTML = html;

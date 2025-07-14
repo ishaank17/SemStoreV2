@@ -687,6 +687,20 @@ app.post('/ReportResource',requireLogin, async (req, res) => {
     res.sendStatus(200);
 })
 
+app.post('/Feedback',requireLogin, async (req, res) => {
+    const {code,reason,details} = req.body;
+    const data = await jwt.verify(req.cookies.session, process.env.SECRET);
+    await report.create({
+        by:data._id,
+        resourceTitle:code,
+        reportedByEmail:data.email,
+        reason:reason,
+        description:details,
+        createdAt:new Date().toLocaleDateString(),
+    })
+    res.sendStatus(200);
+})
+
 app.get('/ManageUpload',requireContri, async (req, res) => {
     res.render('ManageUpload.ejs');
 })
