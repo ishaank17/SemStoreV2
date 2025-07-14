@@ -232,7 +232,21 @@
 
         </div>
 
+
+<!--        Pagination -->
+        <div class="flex justify-center mt-4">
+            <nav class="inline-flex shadow-sm rounded-md" aria-label="Pagination">
+                <button onclick="prevPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-l-md">Previous</button>
+
+                <span class="px-4 py-2 border-t border-b border-gray-300 text-sm font-medium text-gray-700 bg-white">
+      Page <span id="currentPage">1</span> of <span id="totalPages">5</span>
+    </span>
+
+                <button onclick="nextPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-r-md">Next</button>
+            </nav>
+        </div>
     </div>
+
 </main>
 <!-- Overlay -->
 <div id="reportOverlay" class="fixed inset-0 backdrop-blur-sm  bg-opacity-50 flex items-center justify-center hidden z-50">
