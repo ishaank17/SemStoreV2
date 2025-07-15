@@ -209,7 +209,9 @@
           <tr class="text-gray-700 bg-white hover:bg-gray-200">
             <td class="p-3 text-sm whitespace-nowrap"><a href="${files.link}">${files.title}</a></td>
             <td>
-                <img src="images/tick.png" alt="Available offline" style="width:30px;height:30px;">
+                <div class="flex items-center justify-center rounded-full bg-green-600  text-white w-[30px] h-[30px]">
+                    <img src="images/tick.svg" alt="Available offline" class="h-5 w-5">
+                </div>
             </td>
             <td>
                             <button onclick="deleteCache('${files.link}',${files.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md">Delete</button>

@@ -54,20 +54,7 @@
             <% } %>
             </ul>
     </div>
-    <script>
-        const profileToggle = document.getElementById('profileToggle');
-        const profileMenu = document.getElementById('profileMenu');
 
-        profileToggle?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            profileMenu.classList.toggle('hidden');
-        });
-
-        // Hide menu when clicking outside
-        window.addEventListener('click', () => {
-            profileMenu?.classList.add('hidden');
-        });
-    </script>
     <!-- Mobile Menu -->
     <div id="mobileMenu" class="sm:hidden px-4 pb-3 w-full hidden z-77 fixed bg-white ">
         <ul class="space-y-2 text-left">
@@ -89,4 +76,21 @@
             <% } %>
         </ul>
     </div>
+    <script>
+        const profileToggle = document.getElementById('profileToggle');
+        const profileMenu = document.getElementById('profileMenu');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        profileToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu.classList.toggle('hidden');
+        });
+
+        // Hide menu when clicking outside
+        window.addEventListener('click', () => {
+            profileMenu?.classList.add('hidden');
+            // mobileMenu?.classList.add('hidden');
+        });
+
+    </script>
 </nav>

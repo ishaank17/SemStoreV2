@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="w-[30px] h-[30px]" fill="none"
+     viewBox="0 0 31 31" stroke="#6a7282" stroke-width="2.5">
+    <!-- Full 30px diameter, stroke inside bounds -->
+    <circle cx="15.5" cy="15.5" r="14" />
+</svg>

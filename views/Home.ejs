@@ -56,7 +56,7 @@
     </div>
 </div>
 
-<main class="flex-grow p-6 ">
+<main class="flex-grow p-3 ">
 
     <form  action="javascript:void(0)">
         <div class="flex flex-row justify-center gap-4">
@@ -236,13 +236,13 @@
 <!--        Pagination -->
         <div class="flex justify-center mt-4">
             <nav class="inline-flex shadow-sm rounded-md" aria-label="Pagination">
-                <button onclick="prevPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-l-md">Previous</button>
+                <button onclick=" prevPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-l-md">Previous</button>
 
                 <span class="px-4 py-2 border-t border-b border-gray-300 text-sm font-medium text-gray-700 bg-white">
       Page <span id="currentPage">1</span> of <span id="totalPages">5</span>
     </span>
 
-                <button onclick="nextPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-r-md">Next</button>
+                <button onclick=" nextPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-r-md">Next</button>
             </nav>
         </div>
     </div>
@@ -319,6 +319,8 @@
     import { findFollow } from '/js/follow.js';
     import { unfollowCode } from '/js/follow.js';
     import {dbPromise} from '/js/db.js';
+    let currentPage = 1;
+
     async function syncIDBWithCache() {
         const db = await dbPromise ;
 
@@ -378,7 +380,8 @@
             q: query,
             semester,
             branch,
-            order
+            order,
+            currentPage
         });
         console.log("fetching" ,params)
 
@@ -386,9 +389,39 @@
 
 
 
+
+
         fetch(`/Home/Search?${params}`)
             .then(res => res.json())
-            .then(async data => {
+            .then(async DATArec => {
+                const data=DATArec.datasent;
+                function renderTablePage() {
+                    document.getElementById("currentPage").innerHTML = `${currentPage}`;
+                    document.getElementById("totalPages").innerHTML = `${Math.ceil(DATArec.totalCount / DATArec.itemsPerPage)}`;
+
+                }
+
+                function prevPage() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTablePage()
+                        fetchResults();
+                    }
+                }
+
+                function nextPage() {
+
+                    if (currentPage <Math.ceil(DATArec.totalCount / DATArec.itemsPerPage) ){
+                        currentPage++;
+                        renderTablePage()
+                        fetchResults();
+                    }
+                }
+                window.renderTablePage = renderTablePage;
+                window.prevPage = prevPage;
+                window.nextPage = nextPage;
+                renderTablePage();
+
                 console.log("Data received:", data);
                 console.log("Data length:", data.length);
                 // Map to an array of promises resolving to strings
@@ -451,10 +484,15 @@
             <td class="p-3 text-sm whitespace-nowrap">${resource.uploadedAt}</td>
             <td>
               <div class="flex flex-row gap-6">
-                <button disabled type="button" onclick="event.stopPropagation(); dwload(); cachefile('${resource.path}','${resource.title}',this ,'${resource._id}');" id="cache-btn" class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+                <button disabled type="button"  id="cache-btn" class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium">
+<!--                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>-->
+                    <img src="/images/download.svg" alt="Downloaded" class="h-5 w-5" />
+
                 </button>
-                <img src="/images/tick.png" alt="Available offline" style="width:30px;height:30px;">
+                <div onclick="event.stopPropagation();"
+                    class="flex items-center justify-center rounded-full bg-green-600  text-white w-[30px] h-[30px]">
+                    <img src="/images/tick.svg" alt="Downloaded" class="h-5 w-5" />
+                </div>
               </div>
             </td>
                <td class="p-3 text-sm whitespace-nowrap">
@@ -485,9 +523,17 @@
             <td>
               <div class="flex flex-row gap-6">
                 <button type="button" onclick="event.stopPropagation(); dwload(); cachefile('${resource.path}','${resource.title}',this ,'${resource._id}');" id="cache-btn" class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
+<!--                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>-->
+                      <img src="/images/download.svg" alt="Download" class="h-5 w-5" />
                 </button>
-                <img src="/images/untick.png" alt="Not available offline" style="width:30px;height:30px;">
+
+<!--                <img src="/images/untick.svg" alt="Not available offline" style="width:30px;height:30px;">-->
+
+                <div onclick="event.stopPropagation();"
+
+                     class="img_holder flex items-center justify-center rounded-full bg-none text-gray-500 w-[30px] h-[30px]">
+                  <img src="/images/untick.svg" alt="Download" class="w-[30px] h-[30px]" />
+                </div>
               </div>
             </td>
             <td class="p-3 text-sm whitespace-nowrap">
@@ -569,9 +615,10 @@
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
                   </button>
 
-                <button disabled type="button" onclick=" dwload(); cachefile('${resource.path}','${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-gray-400 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition">
-<!--                                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>-->
-                    Downloaded
+                <button type="button" disabled id="downloadBtn"
+                        class="p-2 rounded-full bg-green-600 hover:bg-green-700 active:scale-95 transition duration-150 ease-in-out text-white">
+                    <!-- Check Icon -->
+                    <img src="/images/tick.svg" alt="Downloaded" class="h-5 w-5" />
                 </button>
                 </div>
             </div>
@@ -602,8 +649,10 @@
                       <button onclick="openReportOverlay('${resource._id}','${resource.coursecode}')" class="text-red-500 hover:text-red-600" title="Report Resource">
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 512 512"><path d="M256 512A256 256 0 1 0 256 0a256 256 0 1 0 0 512zm0-384c13.3 0 24 10.7 24 24l0 112c0 13.3-10.7 24-24 24s-24-10.7-24-24l0-112c0-13.3 10.7-24 24-24zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/></svg>
                       </button>
-                    <button type="button" onclick="dwload(); cachefile('${resource.path}','${resource.title}',this,'${resource._id}');"  class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 20h14a1 1 0 001-1v-1a5 5 0 00-5-5H9a5 5 0 00-5 5v1a1 1 0 001 1z"/></svg>
-                        Offline
+                    <button type="button" id="downloadBtn" onclick="dwload(); cachefile('${resource.path}','${resource.title}',this,'${resource._id}');"
+                            class="p-2 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-95 transition duration-150 ease-in-out text-white">
+                        <!-- Download Icon -->
+                    <img src="/images/download.svg" alt="Download" class="h-5 w-5" />
                     </button>
                 </div>
             </div>
@@ -701,9 +750,12 @@
             const cache = await caches.open("offline-files");
             await cache.put(fileUrl, fileResponse.clone());
 
-            const img = btn.parentElement.querySelector('img');
+            const par=btn.parentElement.querySelector('.img_holder')
+            const img = par.querySelector('img');
+            img.className="h-5 w-5"
+            par.className="flex items-center justify-center rounded-full bg-green-600  text-white w-[30px] h-[30px]"
             if (img) {
-                img.src = 'images/tick.png';
+                img.src = 'images/tick.svg';
                 img.alt = 'Available offline';
             } else {
                 // No img found (mobile?), update button text instead
@@ -712,7 +764,7 @@
             btn.disabled=true;
             btn.classList.remove('bg-blue-600', 'hover:bg-blue-700' ,'transition');
             btn.classList.add('bg-gray-400');
-            console.log("✅ File cached as:", fileUrl,"\n And deletion from local :",res);
+            console.log("✅ File cached as:", fileUrl);
 
         } catch (err) {
             console.error("❌ Failed to cache file:", err);

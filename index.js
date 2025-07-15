@@ -283,8 +283,8 @@ app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
     res.json({contents: contentNo,users:usersNo});
 });
 app.get('/Home/search', requireLogin, async (req, res) => {
-    const { q, semester, branch,order } = req.query;
-    console.log("Fetching");
+    const { q, semester, branch,order,currentPage } = req.query;
+    // console.log("Fetching");
     let filter = {};
 
     if (q) {
@@ -299,11 +299,19 @@ app.get('/Home/search', requireLogin, async (req, res) => {
     if (branch) filter.branch = branch;
     // console.log(typeof (order));
     // console.log("Filter:", JSON.stringify(filter, null, 2));
-    const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
-    res.json(results);
+    const totalCount = await content.countDocuments(filter);
+    const itemsPerPage=20
+    const skip = (currentPage - 1) * itemsPerPage;
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }).skip(skip).limit(itemsPerPage);
+
+    res.json({
+        datasent: results,
+        totalCount,
+        itemsPerPage
+        });
 });
 app.get('/AdminPanel/search', requireAdmin, async (req, res) => {
-    const { q, semester, branch,order } = req.query;
+    const { q, semester, branch,order,currentPage } = req.query;
 
     let filter = {};
 
@@ -323,15 +331,21 @@ app.get('/AdminPanel/search', requireAdmin, async (req, res) => {
     }
     if (semester) filter.semester = semester;
     if (branch) filter.branch = branch;
-    // console.log(typeof (order));
-    // console.log("Filter:", JSON.stringify(filter, null, 2));
-    const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
-    res.json(results);
+
+    const totalCount = await content.countDocuments(filter);
+    const itemsPerPage=20
+    const skip = (currentPage - 1) * itemsPerPage;
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }).skip(skip).limit(itemsPerPage);
+    res.json({
+        datasent: results,
+        totalCount,
+        itemsPerPage
+    });
 });
 
 
 app.get('/AdminPanel/Users/search', requireAdmin, async (req, res) => {
-    const { q, role } = req.query;
+    const { q, role ,currentPage} = req.query;
 
     let filter = {};
 
@@ -339,8 +353,18 @@ app.get('/AdminPanel/Users/search', requireAdmin, async (req, res) => {
         filter.$or=[{ name: { $regex: q, $options: 'i' }} , {role:{ $regex: q, $options: 'i' } }]
     }
     if (role) filter.role = role;
-    const results = await userModel.find(filter); //.sort({name: 1}); //.limit(20)
-    res.json(results);
+
+    const totalCount = await userModel.countDocuments(filter);
+    const itemsPerPage=20
+    const skip = (currentPage - 1) * itemsPerPage;
+
+
+    const results = await userModel.find(filter).skip(skip).limit(itemsPerPage); //.sort({name: 1}); //.limit(20)
+    res.json({
+        datasent: results,
+        totalCount,
+        itemsPerPage
+    });
 });
 
 app.get('/Signup', (req, res) => {
@@ -706,7 +730,7 @@ app.get('/ManageUpload',requireContri, async (req, res) => {
 })
 
 app.get('/ManageUpload/search', requireAdmin, async (req, res) => {
-    const { q, semester, branch,order } = req.query;
+    const { q, semester, branch,order,currentPage } = req.query;
     const data = await jwt.verify(req.cookies.session, process.env.SECRET);
 
     let filter = {};
@@ -730,8 +754,16 @@ app.get('/ManageUpload/search', requireAdmin, async (req, res) => {
     filter.uploadedByID = data._id;
     // console.log(typeof (order));
     // console.log("Filter:", JSON.stringify(filter, null, 2));
-    const results = await content.find(filter).sort({ popularity: parseInt(order) }); //.limit(20)
-    res.json(results);
+     //.limit(20)
+    const totalCount = await content.countDocuments(filter);
+    const itemsPerPage=1
+    const skip = (currentPage - 1) * itemsPerPage;
+    const results = await content.find(filter).sort({ popularity: parseInt(order) }).skip(skip).limit(itemsPerPage);
+    res.json({
+        datasent: results,
+        totalCount,
+        itemsPerPage
+    });
 });
 
 app.get('/ManageUpload/Delete/:file/:_id',requireContri, async (req, res) => {

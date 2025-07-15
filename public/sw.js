@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'sem-store-v36';
+const CACHE_NAME = 'sem-store-v37';
 // caches.keys().then(keys => {
 //     keys.forEach(key => {
 //         if (key.startsWith('sem-store-') && key !== CACHE_NAME) {
@@ -15,8 +15,10 @@ const CACHE_NAME = 'sem-store-v36';
 const urlsToCache = [
     '/manifest.json',
     '/startSW.js',
-    '/src/Style.css',
-    '/images/tick.png',
+    '/src/new.css',
+    '/images/tick.svg',
+    '/images/untick.svg',
+    '/images/download.svg',
     '/icons/favicon.ico',
     '/icons/web-app-manifest-192x192.png',
     '/icons/web-app-manifest-512x512.png',

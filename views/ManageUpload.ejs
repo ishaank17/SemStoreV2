@@ -208,8 +208,21 @@
         <div class="grid grid-cols-1 gap-4 md:hidden" id="resultsmobile">
 
         </div>
+        <!--        Pagination -->
+        <div class="flex justify-center mt-4">
+            <nav class="inline-flex shadow-sm rounded-md" aria-label="Pagination">
+                <button onclick=" prevPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-l-md">Previous</button>
+
+                <span class="px-4 py-2 border-t border-b border-gray-300 text-sm font-medium text-gray-700 bg-white">
+      Page <span id="currentPage">1</span> of <span id="totalPages">5</span>
+    </span>
+
+                <button onclick=" nextPage()" class="px-4 py-2 border border-gray-300 text-sm font-medium text-gray-700 bg-white hover:bg-gray-100 rounded-r-md">Next</button>
+            </nav>
+        </div>
 
     </div>
+
 </main>
 
 
@@ -225,7 +238,7 @@
     const resultsContainer2 = document.getElementById('resultsmobile');
 
     let debounceTimeout;
-
+    let currentPage = 1;
     function fetchResults() {
         const form = document.querySelector('form');
         const formData = new FormData(form);
@@ -239,7 +252,8 @@
             q: query,
             semester,
             branch,
-            order
+            order,
+            currentPage
         });
         console.log(params)
 
@@ -248,7 +262,35 @@
 
         fetch(`/ManageUpload/Search?${params}`)
             .then(res => res.json())
-            .then(async data => {
+            .then(async DATArec => {
+                const data=DATArec.datasent;
+                function renderTablePage() {
+                    document.getElementById("currentPage").innerHTML = `${currentPage}`;
+                    document.getElementById("totalPages").innerHTML = `${Math.ceil(DATArec.totalCount / DATArec.itemsPerPage)}`;
+
+                }
+
+                function prevPage() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        renderTablePage()
+                        fetchResults();
+                    }
+                }
+
+                function nextPage() {
+
+                    if (currentPage <Math.ceil(DATArec.totalCount / DATArec.itemsPerPage) ){
+                        currentPage++;
+                        renderTablePage()
+                        fetchResults();
+                    }
+                }
+                window.renderTablePage = renderTablePage;
+                window.prevPage = prevPage;
+                window.nextPage = nextPage;
+                renderTablePage();
+
                 const rows = await Promise.all(data.map(async resource => {
                     return `
           <tr class="text-gray-700 bg-white hover:bg-gray-200">
