@@ -729,7 +729,7 @@ app.get('/ManageUpload',requireContri, async (req, res) => {
     res.render('ManageUpload.ejs');
 })
 
-app.get('/ManageUpload/search', requireAdmin, async (req, res) => {
+app.get('/ManageUpload/search', requireContri, async (req, res) => {
     const { q, semester, branch,order,currentPage } = req.query;
     const data = await jwt.verify(req.cookies.session, process.env.SECRET);
 
@@ -756,7 +756,7 @@ app.get('/ManageUpload/search', requireAdmin, async (req, res) => {
     // console.log("Filter:", JSON.stringify(filter, null, 2));
      //.limit(20)
     const totalCount = await content.countDocuments(filter);
-    const itemsPerPage=1
+    const itemsPerPage=20
     const skip = (currentPage - 1) * itemsPerPage;
     const results = await content.find(filter).sort({ popularity: parseInt(order) }).skip(skip).limit(itemsPerPage);
     res.json({
