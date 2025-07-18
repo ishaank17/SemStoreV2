@@ -65,7 +65,7 @@
             <ul class="space-y-2 text-sm">
                 <li class="font-medium"><span  >Total Users:</span> <span id="users"></span></li>
                 <li class="font-medium"><span  >Uploaded Resources:</span> <span id="resources"></span></li>
-                <li class="font-medium"><span >Reports This Week:</span>#Placeholder</li>
+                <li class="font-medium"><span >Pending Reports :</span> <span id="reports"></span></li>
             </ul>
         </div>
         <div class="bg-white rounded-2xl shadow-md p-6">
@@ -88,6 +88,7 @@
         .then(data=> {
             document.getElementById('users').innerHTML = data.users;
             document.getElementById('resources').innerHTML = data.contents;
+            document.getElementById('reports').innerHTML = data.reports;
         })
 </script>
 

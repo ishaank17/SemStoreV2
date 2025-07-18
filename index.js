@@ -279,8 +279,9 @@ app.get('/Home', fetchCourseCodes, requireLogin,async(req, res) => {
 app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
     const contentNo= await content.countDocuments();
     const usersNo= await userModel.countDocuments();
+    const reportCount= await report.countDocuments({ status: 'Pending' });
 
-    res.json({contents: contentNo,users:usersNo});
+    res.json({contents: contentNo,users:usersNo,reports:reportCount});
 });
 app.get('/Home/search', requireLogin, async (req, res) => {
     const { q, semester, branch,order,currentPage } = req.query;
