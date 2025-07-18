@@ -10,9 +10,9 @@
 <!--            </svg>                    -->
 <!--        </button>-->
         <% if (name) { %>
-            <img src="<%= typeof profilePhoto !== 'undefined' ? profilePhoto : '/images/hamburger.png' %>" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" alt="Profile" class="h-10 w-10 rounded-full border-2 border-blue-500 cursor-pointer sm:hidden"/>
+            <img src="<%= typeof profilePhoto !== 'undefined' ? profilePhoto : '/images/hamburger.png' %>"  alt="Profile" class="mobLogo h-10 w-10 rounded-full border-2 border-blue-500 cursor-pointer sm:hidden"/>
         <%}else{%>
-            <img src="<%= typeof profilePhoto !== 'undefined' ? profilePhoto : '/images/hamburger.png' %>" onclick="document.getElementById('mobileMenu').classList.toggle('hidden')" alt="Profile" class="h-10 w-10 rounded-full   cursor-pointer sm:hidden"/>
+            <img src="<%= typeof profilePhoto !== 'undefined' ? profilePhoto : '/images/hamburger.png' %>"  alt="Profile" class="mobLogo h-10 w-10 rounded-full   cursor-pointer sm:hidden"/>
         <%}%>
 
         <!-- Logo & Brand -->
@@ -78,6 +78,7 @@
     </div>
     <script>
         const profileToggle = document.getElementById('profileToggle');
+        const mobileToggle = document.querySelector('.mobLogo');
         const profileMenu = document.getElementById('profileMenu');
         const mobileMenu = document.getElementById('mobileMenu');
 
@@ -85,11 +86,15 @@
             e.stopPropagation();
             profileMenu.classList.toggle('hidden');
         });
+        mobileToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            mobileMenu.classList.toggle('hidden');
+        });
 
         // Hide menu when clicking outside
         window.addEventListener('click', () => {
             profileMenu?.classList.add('hidden');
-            // mobileMenu?.classList.add('hidden');
+            mobileMenu?.classList.add('hidden');
         });
 
     </script>
