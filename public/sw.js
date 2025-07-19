@@ -177,9 +177,9 @@ self.addEventListener('push', async (event) => {
     const options = {
         body: data.body,
         //img if needed
-        icon:data.icon,
+        icon:data.icon || '/icons/logo.png',
     };
-    console.log("Notification Stored");
+    console.log("Notification Stored",options);
     db.add("notifications", data);
     event.waitUntil(
         self.registration.showNotification(data.title, options)
