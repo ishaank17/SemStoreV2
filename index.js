@@ -48,32 +48,7 @@ app.set('view engine', 'ejs')
 const upload = multer({ storage: multer.memoryStorage() });
 
 
-//UPLOAD TO GOOGLE
-// const {google} = require('googleapis');
-// const apikeys= {
-//     "type": "service_account",
-//     "project_id": "oauth-461019",
-//     "private_key_id": `${process.env.STORAGE_KEY_ID}`,
-//     "private_key": process.env.STORAGE_KEY.replace(/\\n/g, '\n'),
-//     "client_email": `${process.env.STORAGE_CLIENT_EMAIL}`,
-//     "client_id":process.env.STORAGE_CLIENT_ID ,
-//     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-//     "token_uri": "https://oauth2.googleapis.com/token",
-//     "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-//     "client_x509_cert_url": process.env.STORAGE_CLIENT_CERT_URL,
-//     "universe_domain": "googleapis.com"
-// }
-// const SCOPE=['https://www.googleapis.com/auth/drive'];
-// async function authorize() {
-//     const jwtClient = new google.auth.JWT(
-//         apikeys.client_email,
-//         null,
-//         apikeys.private_key,
-//         SCOPE
-//     );
-//     await jwtClient.authorize();
-//     return jwtClient;
-// }
+
 
 
 
@@ -204,8 +179,6 @@ async function getUserData(accessToken) {
     return await response.json();
 }
 
-
-
 //REDIRECTS OF PAGES
 app.get('/Login', async (req, res) => {
     const code = req.query.code;
@@ -260,6 +233,7 @@ app.get('/Login', async (req, res) => {
         else res.redirect('/Home');
     }
 })
+
 app.post('/Create', async (req, res) => {
     let {phone,branch ,batch ,bio}= req.body;
     const data = await jwt.verify(req.cookies.session, process.env.SECRET);
@@ -272,10 +246,12 @@ app.post('/Create', async (req, res) => {
 
     res.redirect('/Home');
 })
+
 app.get('/Home', fetchCourseCodes, requireLogin,async(req, res) => {
     res.render('Home.ejs',{ courseCodes: req.courseCodes });
 
 })
+
 app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
     const contentNo= await content.countDocuments();
     const usersNo= await userModel.countDocuments();
@@ -283,6 +259,7 @@ app.get('/AdminPanel/Results', requireAdmin, async (req, res) => {
 
     res.json({contents: contentNo,users:usersNo,reports:reportCount});
 });
+
 app.get('/Home/search', requireLogin, async (req, res) => {
     const { q, semester, branch,order,currentPage } = req.query;
     // console.log("Fetching");
@@ -311,6 +288,7 @@ app.get('/Home/search', requireLogin, async (req, res) => {
         itemsPerPage
         });
 });
+
 app.get('/AdminPanel/search', requireAdmin, async (req, res) => {
     const { q, semester, branch,order,currentPage } = req.query;
 
@@ -344,7 +322,6 @@ app.get('/AdminPanel/search', requireAdmin, async (req, res) => {
     });
 });
 
-
 app.get('/AdminPanel/Users/search', requireAdmin, async (req, res) => {
     const { q, role ,currentPage} = req.query;
 
@@ -372,21 +349,24 @@ app.get('/Signup', (req, res) => {
     res.render('Signup.ejs');
 })
 
-
 app.get('/Error', (req, res) => {
     const error = req.query.error;
     res.render('error', { error });
 });
+
 app.get('/Logout', (req, res) => {
     res.cookie('session', "")
     res.redirect('/');
 })
+
 app.get('/AdminPanel',requireAdmin, (req, res) => {
     res.render("AdminPanel.ejs");
 })
+
 app.get('/Downloads',requireLogin, (req, res) => {
     res.render('Downloads.ejs');
 })
+
 app.get('/Upload',requireContri, (req, res) => {
     res.render('Upload.ejs');
 })
@@ -421,10 +401,12 @@ app.post('/UploadFile',requireContri,upload.single("file_input") ,async (req, re
         res.status(500).send("Upload failed");
     }
 });
+
 app.get("/contents/:file",requireLogin, (req, res) => {
     const fullPath = path.resolve("public/contents", req.params.file);
     res.sendFile(fullPath);
 });
+
 app.get("/api/file/:id",requireLogin, async (req, res) => {
     try {
         const filePath = await downloadFile(req.params.id, "public/contents");
@@ -436,34 +418,15 @@ app.get("/api/file/:id",requireLogin, async (req, res) => {
     }
 });
 
-// app.post('/delete/:filename',requireLogin, async (req, res) => {
-//     const filename = req.params.filename;
-//     const filePath = path.resolve('public/contents', filename);
-//
-//     try {
-//         fs.unlink(filePath, (err) => {
-//             if (err) {
-//                 console.error("Failed to delete file after cache:", err);
-//             } else {
-//                 console.log("File deleted successfully after cache");
-//             }
-//         });
-//         console.log(`Deleted file: ${filename}`);
-//         res.json({ success: true });
-//     } catch (err) {
-//         console.error(`Error deleting file: ${filename}`, err);
-//         res.status(500).json({ error: 'Failed to delete file' });
-//     }
-// });
-
-
 app.get('/AdminPanel/Users', requireAdmin,async (req, res) => {
     res.render('ManageUsers.ejs');
 });
+
 app.get('/AdminPanel/Reports',requireAdmin,  (req, res) => {
     console.log("Rendering reports");
     res.render('ManageReports.ejs');
 })
+
 app.get('/AdminPanel/GetReports',requireAdmin ,async (req, res) => {
     const status = req.query.st;
     let query = {};
@@ -488,6 +451,7 @@ app.get('/AdminPanel/Delete/:file/:_id',requireAdmin, async (req, res) => {
 
     res.redirect('/AdminPanel/Content');
 });
+
 app.post('/AdminPanel/Users/:id/promote',requireAdmin, async (req, res) => {
     const result =await userModel.findOne({ _id: req.params.id });
     let roles="";
@@ -498,6 +462,7 @@ app.post('/AdminPanel/Users/:id/promote',requireAdmin, async (req, res) => {
     res.redirect('/AdminPanel/Users');
 
 });
+
 app.post('/AdminPanel/Users/:id/demote',requireAdmin, async (req, res) => {
     const result =await userModel.findOne({ _id: req.params.id });
     let roles="";
@@ -507,12 +472,12 @@ app.post('/AdminPanel/Users/:id/demote',requireAdmin, async (req, res) => {
     await userModel.updateOne({ _id: req.params.id },{role:roles})
     res.redirect('/AdminPanel/Users');
 });
+
 app.post('/AdminPanel/Users/:id/delete',requireAdmin, async (req, res) => {
     const result =await userModel.deleteOne({_id: req.params.id});
     res.redirect('/AdminPanel/Users');
 
 });
-
 
 const webpush = require('web-push');
 
@@ -521,11 +486,13 @@ webpush.setVapidDetails(
     process.env.VAPID_PUBLIC_KEY,
     process.env.VAPID_PRIVATE_KEY
 );
+
 app.post("/AdminPanel/Notify/",requireAdmin, async (req, res) => {
     const subs = await subscribe.find();
     const payload = JSON.stringify({
         title: req.body.title,
-        body: req.body.msg
+        body: req.body.msg,
+        icon: '/icons/logo.png'
     });
 
     const results = [];
@@ -551,6 +518,7 @@ app.post("/AdminPanel/Notify/",requireAdmin, async (req, res) => {
 
     res.json({ results });
 });
+
 app.post("/Subscribe", async (req, res) => {
     try {
         const subData = req.body;
@@ -567,9 +535,11 @@ app.post("/Subscribe", async (req, res) => {
         res.sendStatus(500); // ✅ Fail silently on error
     }
 });
+
 app.get("/AdminPanel/Announce",requireAdmin,  (req, res) => {
     res.render('Announce.ejs');
 })
+
 app.post("/AdminPanel/Reports/:id/reply/:by",requireAdmin, async (req, res) => {
     try {
         const repoID = req.params.id;
@@ -585,7 +555,9 @@ app.post("/AdminPanel/Reports/:id/reply/:by",requireAdmin, async (req, res) => {
         const subs = await subscribe.find({id: by});
         const payload = JSON.stringify({
             title: "An Admin has replied to your report !",
-            body: reply
+            body: reply,
+            icon: '/icons/logo.png'
+
         });
 
         const results = [];
@@ -630,7 +602,8 @@ app.post("/AdminPanel/Reports/:id/resolve/:by",requireAdmin, async (req, res) =>
         const subs = await subscribe.find({id: by});
         const payload = JSON.stringify({
             title: "An Admin has replied to your report !",
-            body: "Your Issue has Been Resolved !!!"
+            body: "Your Issue has Been Resolved !!!",
+            icon: '/icons/logo.png'
         });
 
         const results = [];
@@ -661,7 +634,6 @@ app.post("/AdminPanel/Reports/:id/resolve/:by",requireAdmin, async (req, res) =>
     }
 })
 
-
 app.post("/AdminPanel/Reports/delete-resource/:id",requireAdmin, async (req, res) => {
     try {
         const id = req.params.id;
@@ -671,13 +643,16 @@ app.post("/AdminPanel/Reports/delete-resource/:id",requireAdmin, async (req, res
         res.status(500).send("Server Error");
     }
 });
+
 // app.get('/AdminPanel/Content', async (req, res) => {
 //     res.render('ManageContent.ejs');
 // });
+
 app.get('/AdminPanel/Content{/:id}',requireAdmin, async (req, res) => {
     const searchid = req.params.id || null;
     res.render('ManageContent.ejs', { searchid });
 });
+
 app.post('/followCourse',requireLogin, async (req, res) => {
     const { coursecode } = req.body;
     await content.updateMany(
@@ -695,7 +670,6 @@ app.post('/unfollowCourse',requireLogin, async (req, res) => {
     );
     res.sendStatus(200);
 });
-
 
 app.post('/ReportResource',requireLogin, async (req, res) => {
     const {id,code,reason,details} = req.body;
@@ -779,6 +753,7 @@ app.get('/ManageUpload/Delete/:file/:_id',requireContri, async (req, res) => {
 
     res.redirect('/ManageUpload');
 });
+
 app.listen(80,() => console.log(`Server running on port 80`));
 
 
