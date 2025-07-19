@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'sem-store-v37';
+const CACHE_NAME = 'sem-store-v38';
 // caches.keys().then(keys => {
 //     keys.forEach(key => {
 //         if (key.startsWith('sem-store-') && key !== CACHE_NAME) {
@@ -177,10 +177,10 @@ self.addEventListener('push', async (event) => {
     const options = {
         body: data.body,
         //img if needed
-
+        icon:data.icon,
     };
     console.log("Notification Stored");
-    db.add("notifications", event.data.json());
+    db.add("notifications", data);
     event.waitUntil(
         self.registration.showNotification(data.title, options)
     );
